@@ -1,23 +1,16 @@
-import { useEffect, useState } from 'react'
-import { supabase } from './lib/supabaseClient'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Login from './pages/Login'
+import ClientGallery from './pages/ClientGallery'
 
 function App() {
-  const [status, setStatus] = useState('Connexion en cours...')
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ error }) => {
-      if (error) {
-        setStatus('Erreur : ' + error.message)
-      } else {
-        setStatus('✅ Connecté à Supabase avec succès !')
-      }
-    })
-  }, [])
-
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>{status}</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/connexion" />} />
+        <Route path="/connexion" element={<Login />} />
+        <Route path="/galerie" element={<ClientGallery />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
