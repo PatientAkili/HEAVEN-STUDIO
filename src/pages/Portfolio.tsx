@@ -10,6 +10,18 @@ function Portfolio() {
 
   return (
     <div style={styles.page}>
+      <style>{`
+        @media (max-width: 600px) {
+          .portfolio-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (min-width: 601px) and (max-width: 900px) {
+          .portfolio-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+      `}</style>
       <Navbar active="portfolio" />
 
       <section style={styles.header}>
@@ -32,7 +44,7 @@ function Portfolio() {
         ))}
       </div>
 
-      <div style={styles.grid}>
+      <div className="portfolio-grid" style={styles.grid}>
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} style={styles.gridItem}>
             <span style={styles.gridItemLabel}>Photo à venir</span>

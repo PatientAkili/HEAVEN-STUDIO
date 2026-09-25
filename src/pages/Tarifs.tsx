@@ -35,11 +35,24 @@ function Tarifs() {
           height: 100vh;
           overflow: hidden;
         }
-        @media (max-height: 700px) {
+        @media (max-height: 700px), (max-width: 700px) {
           .tarifs-page {
             height: auto;
             min-height: 100vh;
             overflow-y: auto;
+          }
+          .tarifs-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (min-width: 701px) and (max-width: 900px) {
+          .tarifs-page {
+            height: auto;
+            min-height: 100vh;
+            overflow-y: auto;
+          }
+          .tarifs-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
           }
         }
       `}</style>
@@ -51,7 +64,7 @@ function Tarifs() {
         <p style={styles.subtitle}>Des formules adaptées à chaque besoin</p>
       </section>
 
-      <div style={styles.grid}>
+      <div className="tarifs-grid" style={styles.grid}>
         {offres.map((offre, index) => {
           const isHovered = hoveredIndex === index
           const isOtherHovered = hoveredIndex !== null && hoveredIndex !== index

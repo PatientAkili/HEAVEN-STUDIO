@@ -44,9 +44,16 @@ function Contact() {
 
   return (
     <div style={styles.page}>
+      <style>{`
+        @media (max-width: 700px) {
+          .contact-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
       <Navbar active="contact" />
 
-      <section style={styles.content}>
+      <section className="contact-grid" style={styles.content}>
         <div style={styles.left}>
           <h1 style={styles.title}>Parlons de votre projet</h1>
           <p style={styles.subtitle}>
