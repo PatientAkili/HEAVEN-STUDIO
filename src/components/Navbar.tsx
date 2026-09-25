@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom'
 
 interface NavbarProps {
   active?: 'accueil' | 'portfolio' | 'tarifs' | 'contact'
+  mode?: 'public' | 'client'
+  onLogout?: () => void
 }
 
-function Navbar({ active }: NavbarProps) {
+function Navbar({ active, mode = 'public', onLogout }: NavbarProps) {
   const isActive = (key: string) => active === key
 
   return (
@@ -23,34 +25,42 @@ function Navbar({ active }: NavbarProps) {
         }
       `}</style>
 
-      <Link to="/" style={styles.logo}>HEAVEN ROYAL STUDIO PROD</Link>
+      <Link to={mode === 'client' ? '/galerie' : '/'} style={styles.logo}>
+        HEAVEN ROYAL STUDIO PROD
+      </Link>
 
-      <div style={styles.navLinks}>
-        <Link
-          to="/portfolio"
-          className="nav-pill"
-          style={{ ...styles.pill, ...(isActive('portfolio') ? styles.pillActive : {}) }}
-        >
-          Portfolio
-        </Link>
-        <Link
-          to="/tarifs"
-          className="nav-pill"
-          style={{ ...styles.pill, ...(isActive('tarifs') ? styles.pillActive : {}) }}
-        >
-          Tarifs
-        </Link>
-        <Link
-          to="/contact"
-          className="nav-pill"
-          style={{ ...styles.pill, ...(isActive('contact') ? styles.pillActive : {}) }}
-        >
-          Contact
-        </Link>
-        <Link to="/connexion" className="nav-pill" style={styles.pill}>
-          Espace Client
-        </Link>
-      </div>
+      {mode === 'client' ? (
+        <button onClick={onLogout} className="nav-pill" style={styles.pillButton}>
+          Déconnexion
+        </button>
+      ) : (
+        <div style={styles.navLinks}>
+          <Link
+            to="/portfolio"
+            className="nav-pill"
+            style={{ ...styles.pill, ...(isActive('portfolio') ? styles.pillActive : {}) }}
+          >
+            Portfolio
+          </Link>
+          <Link
+            to="/tarifs"
+            className="nav-pill"
+            style={{ ...styles.pill, ...(isActive('tarifs') ? styles.pillActive : {}) }}
+          >
+            Tarifs
+          </Link>
+          <Link
+            to="/contact"
+            className="nav-pill"
+            style={{ ...styles.pill, ...(isActive('contact') ? styles.pillActive : {}) }}
+          >
+            Contact
+          </Link>
+          <Link to="/connexion" className="nav-pill" style={styles.pill}>
+            Espace Client
+          </Link>
+        </div>
+      )}
     </nav>
   )
 }
@@ -93,6 +103,16 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   pillActive: {
     boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.5) inset',
+  },
+  pillButton: {
+    padding: '0.45rem 1.1rem',
+    borderRadius: '999px',
+    background: 'linear-gradient(90deg, #3B82F6 0%, #9333EA 100%)',
+    color: '#FFFFFF',
+    border: 'none',
+    fontSize: '0.85rem',
+    fontWeight: 600,
+    cursor: 'pointer',
   },
 }
 
