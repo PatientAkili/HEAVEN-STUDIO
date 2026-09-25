@@ -4,9 +4,11 @@ interface NavbarProps {
   active?: 'accueil' | 'portfolio' | 'tarifs' | 'contact'
   mode?: 'public' | 'client'
   onLogout?: () => void
+  homeTo?: string
+  label?: string
 }
 
-function Navbar({ active, mode = 'public', onLogout }: NavbarProps) {
+function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProps) {
   const isActive = (key: string) => active === key
 
   return (
@@ -25,8 +27,8 @@ function Navbar({ active, mode = 'public', onLogout }: NavbarProps) {
         }
       `}</style>
 
-      <Link to={mode === 'client' ? '/galerie' : '/'} style={styles.logo}>
-        HEAVEN ROYAL STUDIO PROD
+      <Link to={homeTo ?? (mode === 'client' ? '/galerie' : '/')} style={styles.logo}>
+        {label ?? 'HEAVEN ROYAL STUDIO PROD'}
       </Link>
 
       {mode === 'client' ? (

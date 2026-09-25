@@ -1,20 +1,45 @@
 import { useState } from 'react'
+import emailjs from '@emailjs/browser'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
+const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
+const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
 function Contact() {
-  const [form, setForm] = useState({ nom: '', email: '', message: '' })
+  const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [envoye, setEnvoye] = useState(false)
+  const [envoiEnCours, setEnvoiEnCours] = useState(false)
+  const [erreur, setErreur] = useState('')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Pour l'instant, pas d'envoi réel — juste une confirmation visuelle.
-    // On branchera un vrai envoi (email ou base de données) plus tard.
-    setEnvoye(true)
+    setErreur('')
+    setEnvoiEnCours(true)
+
+    try {
+      await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        {
+          name: form.name,
+          email: form.email,
+          title: 'Nouveau message depuis le site',
+          message: form.message,
+        },
+        PUBLIC_KEY
+      )
+      setEnvoye(true)
+    } catch (err) {
+      setErreur("Une erreur s'est produite. Merci de réessayer ou de nous contacter directement.")
+    } finally {
+      setEnvoiEnCours(false)
+    }
   }
 
   return (
@@ -31,24 +56,24 @@ function Contact() {
 
           <div style={styles.infoBlock}>
             <p style={styles.infoLabel}>Email</p>
-            <p style={styles.infoValue}>contact@heavenroyalstudio.com</p>
+            <p style={styles.infoValue}>heavenroyalstudioprod243@gmail.com</p>
           </div>
           <div style={styles.infoBlock}>
             <p style={styles.infoLabel}>Téléphone / WhatsApp</p>
-            <p style={styles.infoValue}>+000 000 000 00</p>
+            <p style={styles.infoValue}>+243 971 862 571</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} style={styles.form}>
           {envoye ? (
-            <p style={styles.successMsg}>✅ Message envoyé ! Je vous répondrai très vite.</p>
+            <p style={styles.successMsg}> Message envoyé ! Je vous répondrai très vite.</p>
           ) : (
             <>
               <input
                 type="text"
-                name="nom"
+                name="name"
                 placeholder="Votre nom"
-                value={form.nom}
+                value={form.name}
                 onChange={handleChange}
                 required
                 style={styles.input}
@@ -71,8 +96,9 @@ function Contact() {
                 rows={5}
                 style={styles.textarea}
               />
-              <button type="submit" className="nav-pill" style={styles.submitButton}>
-                Envoyer le message
+              {erreur && <p style={styles.errorMsg}>{erreur}</p>}
+              <button type="submit" disabled={envoiEnCours} className="nav-pill" style={styles.submitButton}>
+                {envoiEnCours ? 'Envoi en cours...' : 'Envoyer le message'}
               </button>
             </>
           )}
@@ -183,6 +209,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '1.05rem',
     fontWeight: 600,
     padding: '1.5rem 0',
+  },
+  errorMsg: {
+    textAlign: 'center',
+    color: '#F87171',
+    fontSize: '0.85rem',
+    margin: 0,
   },
 }
 

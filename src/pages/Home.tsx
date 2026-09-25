@@ -4,7 +4,21 @@ import Footer from '../components/Footer'
 
 function Home() {
   return (
-    <div style={styles.page}>
+    <div className="home-page" style={styles.page}>
+      <style>{`
+        .home-page {
+          height: 100vh;
+          overflow: hidden;
+        }
+        @media (max-height: 700px) {
+          .home-page {
+            height: auto;
+            min-height: 100vh;
+            overflow-y: auto;
+          }
+        }
+      `}</style>
+
       <Navbar active="accueil" />
 
       <section style={styles.hero}>
@@ -15,10 +29,11 @@ function Home() {
           Studio photo & vidéo professionnel — portraits, événements, mode et bien plus.
         </p>
         <div style={styles.heroButtons}>
-          <Link to="/portfolio" style={styles.primaryButton}>Voir le portfolio</Link>
+          <Link to="/portfolio" className="nav-pill" style={styles.primaryButton}>Voir le portfolio</Link>
           <Link to="/contact" style={styles.secondaryButton}>Me contacter</Link>
         </div>
       </section>
+
       <Footer />
     </div>
   )
@@ -26,52 +41,23 @@ function Home() {
 
 const styles: { [key: string]: React.CSSProperties } = {
   page: {
-    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
     background: 'linear-gradient(160deg, #0F172A 0%, #1E1B4B 55%, #2E1065 100%)',
     color: '#FFFFFF',
     fontFamily: 'Inter, sans-serif',
   },
-  nav: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '1.25rem 1.5rem',
-    flexWrap: 'wrap',
-    gap: '1rem',
-  },
-  logo: {
-    fontWeight: 800,
-    fontSize: '1.2rem',
-    letterSpacing: '0.03em',
-  },
-  navLinks: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1.5rem',
-    flexWrap: 'wrap',
-  },
-  navLink: {
-    color: '#94A3B8',
-    textDecoration: 'none',
-    fontSize: '0.95rem',
-  },
-  navButton: {
-    padding: '0.5rem 1.1rem',
-    borderRadius: '8px',
-    background: 'linear-gradient(90deg, #3B82F6 0%, #9333EA 100%)',
-    color: '#FFFFFF',
-    textDecoration: 'none',
-    fontSize: '0.9rem',
-    fontWeight: 600,
-  },
   hero: {
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center',
     textAlign: 'center',
-    padding: '5rem 1.5rem',
+    padding: '2rem 1.5rem',
     maxWidth: '800px',
     margin: '0 auto',
+    minHeight: 0,
   },
   heroTitle: {
     fontSize: 'clamp(2rem, 5vw, 3.2rem)',
