@@ -24,6 +24,10 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [profiles, setProfiles] = useState<Profile[]>([])
 
+  const [newClientEmail, setNewClientEmail] = useState('')
+  const [newClientPassword, setNewClientPassword] = useState('')
+  const [creatingClient, setCreatingClient] = useState(false)
+
   const [selectedClient, setSelectedClient] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -106,6 +110,45 @@ function AdminDashboard() {
     navigate('/admin/connexion')
   }
 
+  const handleCreateClient = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMessage('')
+    setCreatingClient(true)
+
+    const { data: sessionData } = await supabase.auth.getSession()
+    const accessToken = sessionData.session?.access_token
+
+    try {
+      const response = await fetch(
+        'https://ehsdunyyzbhcnpifxyhm.supabase.co/functions/v1/create-client-user',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ email: newClientEmail, password: newClientPassword }),
+        }
+      )
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        setMessage('Erreur : ' + (result.error ?? 'Échec de la création'))
+      } else {
+        setMessage(` Client ${newClientEmail} créé avec succès.`)
+        setNewClientEmail('')
+        setNewClientPassword('')
+        const { data: profilesData } = await supabase.from('profiles').select('id, email, full_name')
+        setProfiles(profilesData ?? [])
+      }
+    } catch (err) {
+      setMessage('Erreur réseau : ' + String(err))
+    } finally {
+      setCreatingClient(false)
+    }
+  }
+
   const handleCreateGallery = async (e: React.FormEvent) => {
     e.preventDefault()
     setMessage('')
@@ -178,7 +221,33 @@ function AdminDashboard() {
         <h1 style={styles.title}>Tableau de bord Admin</h1>
 
         <section style={styles.card}>
-          <h2 style={styles.cardTitle}>1. Créer une galerie</h2>
+          <h2 style={styles.cardTitle}>1. Créer un compte client</h2>
+          <form onSubmit={handleCreateClient} style={styles.form}>
+            <input
+              type="email"
+              placeholder="Email du client"
+              value={newClientEmail}
+              onChange={(e) => setNewClientEmail(e.target.value)}
+              required
+              style={styles.input}
+            />
+            <input
+              type="password"
+              placeholder="Mot de passe temporaire"
+              value={newClientPassword}
+              onChange={(e) => setNewClientPassword(e.target.value)}
+              required
+              minLength={6}
+              style={styles.input}
+            />
+            <button type="submit" disabled={creatingClient} style={styles.button}>
+              {creatingClient ? 'Création...' : 'Créer le compte client'}
+            </button>
+          </form>
+        </section>
+
+        <section style={styles.card}>
+          <h2 style={styles.cardTitle}>2. Créer une galerie</h2>
           <form onSubmit={handleCreateGallery} style={styles.form}>
             <select
               value={selectedClient}
@@ -214,7 +283,7 @@ function AdminDashboard() {
 
         {createdGalleryId && (
           <section style={styles.card}>
-            <h2 style={styles.cardTitle}>2. Uploader des fichiers</h2>
+            <h2 style={styles.cardTitle}>3. Uploader des fichiers</h2>
             <input
               type="file"
               multiple
