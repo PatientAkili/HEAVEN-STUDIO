@@ -7,6 +7,7 @@ import Login from './pages/Login'
 import ClientGallery from './pages/ClientGallery'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+import NotFound from './pages/NotFound'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/galerie" element={<ClientGallery />} />
         <Route path="/admin/connexion" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )

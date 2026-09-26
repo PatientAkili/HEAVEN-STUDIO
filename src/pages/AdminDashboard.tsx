@@ -12,6 +12,13 @@ interface Profile {
   full_name: string | null
 }
 
+interface ExistingGallery {
+  id: string
+  title: string
+  client_id: string
+  created_at: string
+}
+
 function AdminDashboard() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -23,6 +30,9 @@ function AdminDashboard() {
   const [creating, setCreating] = useState(false)
   const [createdGalleryId, setCreatedGalleryId] = useState('')
   const [message, setMessage] = useState('')
+
+  const [existingGalleries, setExistingGalleries] = useState<ExistingGallery[]>([])
+  const [deletingId, setDeletingId] = useState('')
 
   const [files, setFiles] = useState<FileList | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -38,10 +48,58 @@ function AdminDashboard() {
 
       const { data: profilesData } = await supabase.from('profiles').select('id, email, full_name')
       setProfiles(profilesData ?? [])
+
+      const { data: galleriesData } = await supabase
+        .from('galleries')
+        .select('id, title, client_id, created_at')
+        .order('created_at', { ascending: false })
+      setExistingGalleries(galleriesData ?? [])
+
       setLoading(false)
     }
     checkAccess()
   }, [navigate])
+
+  const reloadGalleries = async () => {
+    const { data } = await supabase
+      .from('galleries')
+      .select('id, title, client_id, created_at')
+      .order('created_at', { ascending: false })
+    setExistingGalleries(data ?? [])
+  }
+
+  const handleDeleteGallery = async (galleryId: string) => {
+    if (!confirm('Supprimer définitivement cette galerie et tous ses fichiers ?')) return
+
+    setDeletingId(galleryId)
+
+    // 1. Récupérer les fichiers de la galerie pour les supprimer du stockage
+    const { data: filesData } = await supabase
+      .from('gallery_files')
+      .select('file_path')
+      .eq('gallery_id', galleryId)
+
+    if (filesData && filesData.length > 0) {
+      const paths = filesData.map((f) => f.file_path)
+      await supabase.storage.from('galleries').remove(paths)
+    }
+
+    // 2. Supprimer les entrées gallery_files
+    await supabase.from('gallery_files').delete().eq('gallery_id', galleryId)
+
+    // 3. Supprimer la galerie elle-même
+    const { error } = await supabase.from('galleries').delete().eq('id', galleryId)
+
+    setDeletingId('')
+
+    if (error) {
+      setMessage("Erreur lors de la suppression : " + error.message)
+      return
+    }
+
+    setMessage(' Galerie supprimée.')
+    reloadGalleries()
+  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -68,6 +126,7 @@ function AdminDashboard() {
 
     setCreatedGalleryId(data.id)
     setMessage(` Galerie "${title}" créée. Tu peux maintenant uploader des fichiers ci-dessous.`)
+    reloadGalleries()
   }
 
   const handleUpload = async () => {
@@ -173,6 +232,34 @@ function AdminDashboard() {
           </section>
         )}
 
+        <section style={styles.card}>
+          <h2 style={styles.cardTitle}>Galeries existantes</h2>
+          {existingGalleries.length === 0 ? (
+            <p style={styles.emptyText}>Aucune galerie créée pour l'instant.</p>
+          ) : (
+            <div style={styles.galleryList}>
+              {existingGalleries.map((g) => {
+                const client = profiles.find((p) => p.id === g.client_id)
+                return (
+                  <div key={g.id} style={styles.galleryRow}>
+                    <div>
+                      <p style={styles.galleryRowTitle}>{g.title}</p>
+                      <p style={styles.galleryRowClient}>{client?.email ?? 'Client inconnu'}</p>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteGallery(g.id)}
+                      disabled={deletingId === g.id}
+                      style={styles.deleteButton}
+                    >
+                      {deletingId === g.id ? '...' : 'Supprimer'}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </section>
+
         {message && <p style={styles.message}>{message}</p>}
       </main>
 
@@ -267,6 +354,44 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: 700,
     fontSize: '0.9rem',
     cursor: 'pointer',
+  },
+  emptyText: {
+    color: '#94A3B8',
+    fontSize: '0.85rem',
+  },
+  galleryList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+  },
+  galleryRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0.75rem 1rem',
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    borderRadius: '10px',
+    gap: '1rem',
+  },
+  galleryRowTitle: {
+    margin: 0,
+    fontWeight: 600,
+    fontSize: '0.9rem',
+  },
+  galleryRowClient: {
+    margin: '0.15rem 0 0 0',
+    color: '#94A3B8',
+    fontSize: '0.8rem',
+  },
+  deleteButton: {
+    padding: '0.4rem 0.9rem',
+    borderRadius: '8px',
+    border: '1px solid rgba(248, 113, 113, 0.4)',
+    backgroundColor: 'rgba(248, 113, 113, 0.1)',
+    color: '#F87171',
+    fontSize: '0.8rem',
+    cursor: 'pointer',
+    flexShrink: 0,
   },
   message: {
     textAlign: 'center',
