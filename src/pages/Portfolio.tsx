@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useState } from 'react'
 
-const categories = ['Toutes', 'Studio', 'Portraits', 'Événementiel', 'Corporate', 'Mode & Beauté', 'Lifestyle']
+const categories = ['Toutes', 'Studio', 'Événementiel', 'Design']
 
 function Portfolio() {
   const [activeCategory, setActiveCategory] = useState('Toutes')
