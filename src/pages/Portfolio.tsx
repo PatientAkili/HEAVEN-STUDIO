@@ -4,8 +4,24 @@ import Footer from '../components/Footer'
 
 const categories = ['Toutes', 'Studio', 'Événementiel', 'Design']
 
+interface Work {
+  src: string
+  title: string
+  category: string
+}
+
+// Pour ajouter une réalisation : copie l'image dans public/portfolio/, puis ajoute une ligne ici.
+// Les images sont dans public/team/ et nommées 1image1.png ... 12image1.png
+const works: Work[] = Array.from({ length: 12 }, (_, i) => ({
+  src: `/team/${i + 1}image1.png`,
+  title: `Design ${i + 1}`,
+  category: 'Design',
+}))
+
 function Portfolio() {
   const [activeCategory, setActiveCategory] = useState('Toutes')
+  const [selected, setSelected] = useState<Work | null>(null)
+  const visibleWorks = works.filter((w) => activeCategory === 'Toutes' || w.category === activeCategory)
 
   return (
     <div style={styles.page}>
@@ -31,6 +47,54 @@ function Portfolio() {
             max-width: 280px !important;
             margin: 0 auto;
           }
+        }
+
+        .work-card {
+          position: relative;
+          transition: transform 0.35s ease, box-shadow 0.35s ease;
+        }
+        .work-card img {
+          transition: transform 0.5s ease, filter 0.35s ease;
+        }
+        .work-card .work-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0));
+          opacity: 0;
+          transition: opacity 0.35s ease;
+        }
+        .work-card .work-icon {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.15);
+          backdrop-filter: blur(4px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transform: scale(0.7);
+          transition: transform 0.35s ease;
+        }
+        .work-card:hover,
+        .work-card:active {
+          transform: translateY(-4px);
+          box-shadow: 0 15px 35px rgba(147, 51, 234, 0.35);
+        }
+        .work-card:hover img,
+        .work-card:active img {
+          transform: scale(1.08);
+          filter: brightness(0.85);
+        }
+        .work-card:hover .work-overlay,
+        .work-card:active .work-overlay {
+          opacity: 1;
+        }
+        .work-card:hover .work-icon,
+        .work-card:active .work-icon {
+          transform: scale(1);
         }
       `}</style>
 
@@ -92,12 +156,36 @@ function Portfolio() {
       </div>
 
       <div className="portfolio-grid" style={styles.grid}>
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} style={styles.gridItem}>
-            <span style={styles.gridItemLabel}>Photo à venir</span>
-          </div>
-        ))}
+        {visibleWorks.length === 0 ? (
+          <p style={styles.emptyText}>Aucune réalisation dans cette catégorie pour le moment.</p>
+        ) : (
+          visibleWorks.map((work) => (
+            <button key={work.src} className="work-card" style={styles.workCard} onClick={() => setSelected(work)}>
+              <img src={work.src} alt={work.title} style={styles.workImg} loading="lazy" />
+              <span className="work-overlay">
+                <span className="work-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="16.5" y1="16.5" x2="21" y2="21" />
+                  </svg>
+                </span>
+              </span>
+            </button>
+          ))
+        )}
       </div>
+
+      {selected && (
+        <div style={styles.lightbox} onClick={() => setSelected(null)}>
+          <button style={styles.lightboxClose} onClick={() => setSelected(null)} aria-label="Fermer">✕</button>
+          <img
+            src={selected.src}
+            alt={selected.title}
+            style={styles.lightboxImg}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       <Footer />
     </div>
@@ -217,6 +305,57 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  workCard: {
+    padding: 0,
+    border: '1px solid rgba(148, 163, 184, 0.15)',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    background: 'rgba(30, 27, 75, 0.5)',
+    cursor: 'pointer',
+    aspectRatio: '4 / 5',
+    position: 'relative',
+  },
+  workImg: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    display: 'block',
+  },
+  emptyText: {
+    gridColumn: '1 / -1',
+    textAlign: 'center',
+    color: '#94A3B8',
+    fontSize: '0.9rem',
+  },
+  lightbox: {
+    position: 'fixed',
+    inset: 0,
+    zIndex: 1000,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1rem',
+  },
+  lightboxImg: {
+    maxWidth: '92vw',
+    maxHeight: '88vh',
+    objectFit: 'contain',
+    borderRadius: '8px',
+  },
+  lightboxClose: {
+    position: 'absolute',
+    top: '1rem',
+    right: '1rem',
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    background: 'rgba(0, 0, 0, 0.5)',
+    color: '#FFFFFF',
+    fontSize: '1.1rem',
+    cursor: 'pointer',
   },
   gridItemLabel: {
     color: '#64748B',
