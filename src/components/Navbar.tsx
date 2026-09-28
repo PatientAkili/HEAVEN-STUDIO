@@ -56,7 +56,8 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
 
       <div style={styles.topRow}>
         <Link to={homeTo ?? (mode === 'client' ? '/galerie' : '/')} style={styles.logo} onClick={close}>
-          {label ?? 'HEAVEN ROYAL STUDIO PROD'}
+          <img src="/public/logo.png/logo-clair.png" alt="" style={styles.logoImg} />
+          <span style={styles.logoText}>{label ?? 'HEAVEN ROYAL STUDIO PROD'}</span>
         </Link>
 
         {mode === 'client' ? (
@@ -129,11 +130,22 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '1rem',
   },
   logo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.6rem',
+    minWidth: 0,
+    color: '#FFFFFF',
+    textDecoration: 'none',
+  },
+  logoImg: {
+    height: '40px',
+    width: 'auto',
+    flexShrink: 0,
+  },
+  logoText: {
     fontWeight: 800,
     fontSize: '1.1rem',
     letterSpacing: '0.03em',
-    color: '#FFFFFF',
-    textDecoration: 'none',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
