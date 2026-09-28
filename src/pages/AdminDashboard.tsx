@@ -19,6 +19,39 @@ interface ExistingGallery {
   created_at: string
 }
 
+const generateThumbnail = (file: File, maxSize = 600, quality = 0.75): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      let { width, height } = img
+      if (width > height && width > maxSize) {
+        height = Math.round((height * maxSize) / width)
+        width = maxSize
+      } else if (height > maxSize) {
+        width = Math.round((width * maxSize) / height)
+        height = maxSize
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext('2d')
+      ctx?.drawImage(img, 0, 0, width, height)
+      canvas.toBlob(
+        (blob) => {
+          URL.revokeObjectURL(url)
+          if (blob) resolve(blob)
+          else reject(new Error('Échec de la génération de la miniature'))
+        },
+        'image/jpeg',
+        quality
+      )
+    }
+    img.onerror = reject
+    img.src = url
+  })
+}
+
 function AdminDashboard() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -183,7 +216,8 @@ function AdminDashboard() {
       setUploadProgress(`Envoi de ${i + 1}/${files.length} : ${file.name}`)
 
       const fileType = file.type.startsWith('video') ? 'video' : 'photo'
-      const filePath = `${selectedClient}/${createdGalleryId}/${Date.now()}_${file.name}`
+      const timestamp = Date.now()
+      const filePath = `${selectedClient}/${createdGalleryId}/${timestamp}_${file.name}`
 
       const { error: uploadError } = await supabase.storage
         .from('galleries')
@@ -194,9 +228,24 @@ function AdminDashboard() {
         continue
       }
 
+      let thumbnailPath: string | null = null
+      if (fileType === 'photo') {
+        try {
+          const thumbBlob = await generateThumbnail(file)
+          const candidatePath = `${selectedClient}/${createdGalleryId}/thumb_${timestamp}_${file.name}`
+          const { error: thumbError } = await supabase.storage
+            .from('galleries')
+            .upload(candidatePath, thumbBlob, { contentType: 'image/jpeg' })
+          if (!thumbError) thumbnailPath = candidatePath
+        } catch {
+          thumbnailPath = null
+        }
+      }
+
       const { error: dbError } = await supabase.from('gallery_files').insert({
         gallery_id: createdGalleryId,
         file_path: filePath,
+        thumbnail_path: thumbnailPath,
         file_type: fileType,
       })
 

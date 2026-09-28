@@ -7,8 +7,10 @@ import Footer from '../components/Footer'
 interface GalleryFile {
   id: string
   file_path: string
+  thumbnail_path: string | null
   file_type: 'photo' | 'video'
   url?: string
+  thumbUrl?: string
 }
 
 interface Gallery {
@@ -55,7 +57,7 @@ function ClientGallery() {
       for (const gallery of galleriesData ?? []) {
         const { data: filesData } = await supabase
           .from('gallery_files')
-          .select('id, file_path, file_type')
+          .select('id, file_path, thumbnail_path, file_type')
           .eq('gallery_id', gallery.id)
 
         const filesWithUrls: GalleryFile[] = []
@@ -63,11 +65,20 @@ function ClientGallery() {
         for (const file of filesData ?? []) {
           const { data: signedUrlData } = await supabase.storage
             .from('galleries')
-            .createSignedUrl(file.file_path, 3600) // lien valide 1h
+            .createSignedUrl(file.file_path, 3600) // lien valide 1h, fichier d'origine (qualité intacte)
+
+          let thumbUrl: string | undefined
+          if (file.thumbnail_path) {
+            const { data: thumbSigned } = await supabase.storage
+              .from('galleries')
+              .createSignedUrl(file.thumbnail_path, 3600)
+            thumbUrl = thumbSigned?.signedUrl
+          }
 
           filesWithUrls.push({
             ...file,
             url: signedUrlData?.signedUrl,
+            thumbUrl,
           })
         }
 
@@ -127,7 +138,7 @@ function ClientGallery() {
                 {gallery.files.map((file) => (
                   <div key={file.id} style={styles.fileCard}>
                     {file.file_type === 'photo' && file.url ? (
-                      <img src={file.url} alt="" style={styles.thumbnail} />
+                      <img src={file.thumbUrl ?? file.url} alt="" style={styles.thumbnail} />
                     ) : (
                       <div style={styles.videoPlaceholder}>🎬 Vidéo</div>
                     )}
