@@ -56,7 +56,7 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
 
       <div style={styles.topRow}>
         <Link to={homeTo ?? (mode === 'client' ? '/galerie' : '/')} style={styles.logo} onClick={close}>
-          <img src="/public/logo.png" alt="" style={styles.logoImg} />
+          <img src="/logo.png" alt="" style={styles.logoImg} />
           <span style={styles.logoText}>{label ?? 'HEAVEN ROYAL STUDIO PROD'}</span>
         </Link>
 
