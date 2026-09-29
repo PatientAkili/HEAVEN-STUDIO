@@ -37,6 +37,7 @@ function AdminLogin() {
   return (
     <div style={styles.container}>
       <form onSubmit={handleLogin} style={styles.card}>
+        <img src="/logo.png" alt="" style={styles.brandLogo} />
         <h1 style={styles.brand}>Espace Admin</h1>
         <p style={styles.subtitle}>Accès réservé au studio</p>
 
@@ -88,6 +89,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '16px',
     border: '1px solid rgba(148, 163, 184, 0.15)',
     boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+  },
+  brandLogo: {
+    display: 'block',
+    height: '56px',
+    width: 'auto',
+    margin: '0 auto 0.5rem',
   },
   brand: {
     color: '#FFFFFF',

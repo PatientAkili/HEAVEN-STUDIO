@@ -31,7 +31,8 @@ function Login() {
   return (
     <div style={styles.container}>
       <form onSubmit={handleLogin} style={styles.card}>
-        <h1 style={styles.brand}>HEAVEN-STUDIO</h1>
+        <img src="/logo.png" alt="" style={styles.brandLogo} />
+        <h1 style={styles.brand}>HEAVEN ROYAL STUDIO PROD</h1>
         <p style={styles.subtitle}>Connectez-vous pour accéder à vos photos et vidéos</p>
 
         <input
@@ -83,6 +84,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '16px',
     border: '1px solid rgba(148, 163, 184, 0.15)',
     boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+  },
+  brandLogo: {
+    display: 'block',
+    height: '56px',
+    width: 'auto',
+    margin: '0 auto 0.5rem',
   },
   brand: {
     color: '#FFFFFF',
