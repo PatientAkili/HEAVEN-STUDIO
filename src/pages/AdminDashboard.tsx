@@ -3,15 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-
-const ADMIN_UID = '1cf86f6f-6561-407f-b5d7-5124846ffdfc'
-
 interface Profile {
   id: string
   email: string
   full_name: string | null
 }
-
 interface ExistingGallery {
   id: string
   title: string
@@ -19,12 +15,17 @@ interface ExistingGallery {
   created_at: string
 }
 
+const CREATE_USER_URL =
+  'https://ehsdunyyzbhcnpifxyhm.supabase.co/functions/v1/create-client-user'
+
 const generateThumbnail = (file: File, maxSize = 600, quality = 0.75): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const img = new Image()
     const url = URL.createObjectURL(file)
+
     img.onload = () => {
       let { width, height } = img
+
       if (width > height && width > maxSize) {
         height = Math.round((height * maxSize) / width)
         width = maxSize
@@ -32,11 +33,12 @@ const generateThumbnail = (file: File, maxSize = 600, quality = 0.75): Promise<B
         width = Math.round((width * maxSize) / height)
         height = maxSize
       }
+
       const canvas = document.createElement('canvas')
       canvas.width = width
       canvas.height = height
-      const ctx = canvas.getContext('2d')
-      ctx?.drawImage(img, 0, 0, width, height)
+      canvas.getContext('2d')?.drawImage(img, 0, 0, width, height)
+
       canvas.toBlob(
         (blob) => {
           URL.revokeObjectURL(url)
@@ -47,6 +49,7 @@ const generateThumbnail = (file: File, maxSize = 600, quality = 0.75): Promise<B
         quality
       )
     }
+
     img.onerror = reject
     img.src = url
   })
@@ -54,50 +57,44 @@ const generateThumbnail = (file: File, maxSize = 600, quality = 0.75): Promise<B
 
 function AdminDashboard() {
   const navigate = useNavigate()
+
+  
   const [loading, setLoading] = useState(true)
   const [profiles, setProfiles] = useState<Profile[]>([])
+  const [existingGalleries, setExistingGalleries] = useState<ExistingGallery[]>([])
 
+  
   const [newClientEmail, setNewClientEmail] = useState('')
   const [newClientPassword, setNewClientPassword] = useState('')
+  const [newClientIsAdmin, setNewClientIsAdmin] = useState(false)
   const [creatingClient, setCreatingClient] = useState(false)
 
+  
   const [selectedClient, setSelectedClient] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [creating, setCreating] = useState(false)
   const [createdGalleryId, setCreatedGalleryId] = useState('')
-  const [message, setMessage] = useState('')
 
-  const [existingGalleries, setExistingGalleries] = useState<ExistingGallery[]>([])
+  
   const [deletingId, setDeletingId] = useState('')
 
+  
   const [files, setFiles] = useState<FileList | null>(null)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
 
-  useEffect(() => {
-    const checkAccess = async () => {
-      const { data } = await supabase.auth.getSession()
-      if (!data.session || data.session.user.id !== ADMIN_UID) {
-        navigate('/admin/connexion')
-        return
-      }
+  
+  const [message, setMessage] = useState('')
 
-      const { data: profilesData } = await supabase.from('profiles').select('id, email, full_name')
-      setProfiles(profilesData ?? [])
+  
 
-      const { data: galleriesData } = await supabase
-        .from('galleries')
-        .select('id, title, client_id, created_at')
-        .order('created_at', { ascending: false })
-      setExistingGalleries(galleriesData ?? [])
+  const loadProfiles = async () => {
+    const { data } = await supabase.from('profiles').select('id, email, full_name')
+    setProfiles(data ?? [])
+  }
 
-      setLoading(false)
-    }
-    checkAccess()
-  }, [navigate])
-
-  const reloadGalleries = async () => {
+  const loadGalleries = async () => {
     const { data } = await supabase
       .from('galleries')
       .select('id, title, client_id, created_at')
@@ -105,39 +102,38 @@ function AdminDashboard() {
     setExistingGalleries(data ?? [])
   }
 
-  const handleDeleteGallery = async (galleryId: string) => {
-    if (!confirm('Supprimer définitivement cette galerie et tous ses fichiers ?')) return
+  
+  useEffect(() => {
+    const checkAccess = async () => {
+      // 1. L'utilisateur est-il connecté ?
+      const { data } = await supabase.auth.getSession()
+      if (!data.session) {
+        navigate('/admin/connexion')
+        return
+      }
 
-    setDeletingId(galleryId)
+      // 2. Est-il dans la table des administrateurs ?
+      const { data: adminRow } = await supabase
+        .from('admins')
+        .select('user_id')
+        .eq('user_id', data.session.user.id)
+        .maybeSingle()
 
-    // 1. Récupérer les fichiers de la galerie pour les supprimer du stockage
-    const { data: filesData } = await supabase
-      .from('gallery_files')
-      .select('file_path')
-      .eq('gallery_id', galleryId)
+      if (!adminRow) {
+        navigate('/admin/connexion')
+        return
+      }
 
-    if (filesData && filesData.length > 0) {
-      const paths = filesData.map((f) => f.file_path)
-      await supabase.storage.from('galleries').remove(paths)
+      // 3. Accès accordé : charger les données
+      await Promise.all([loadProfiles(), loadGalleries()])
+      setLoading(false)
     }
 
-    // 2. Supprimer les entrées gallery_files
-    await supabase.from('gallery_files').delete().eq('gallery_id', galleryId)
+    checkAccess()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate])
 
-    // 3. Supprimer la galerie elle-même
-    const { error } = await supabase.from('galleries').delete().eq('id', galleryId)
-
-    setDeletingId('')
-
-    if (error) {
-      setMessage("Erreur lors de la suppression : " + error.message)
-      return
-    }
-
-    setMessage(' Galerie supprimée.')
-    reloadGalleries()
-  }
-
+  
   const handleLogout = async () => {
     await supabase.auth.signOut()
     navigate('/admin/connexion')
@@ -152,28 +148,30 @@ function AdminDashboard() {
     const accessToken = sessionData.session?.access_token
 
     try {
-      const response = await fetch(
-        'https://ehsdunyyzbhcnpifxyhm.supabase.co/functions/v1/create-client-user',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ email: newClientEmail, password: newClientPassword }),
-        }
-      )
+      const response = await fetch(CREATE_USER_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          email: newClientEmail,
+          password: newClientPassword,
+          isAdmin: newClientIsAdmin,
+        }),
+      })
 
       const result = await response.json()
 
       if (!response.ok) {
         setMessage('Erreur : ' + (result.error ?? 'Échec de la création'))
       } else {
-        setMessage(` Client ${newClientEmail} créé avec succès.`)
+        const type = newClientIsAdmin ? 'Administrateur' : 'Client'
+        setMessage(`${type} ${newClientEmail} créé avec succès.`)
         setNewClientEmail('')
         setNewClientPassword('')
-        const { data: profilesData } = await supabase.from('profiles').select('id, email, full_name')
-        setProfiles(profilesData ?? [])
+        setNewClientIsAdmin(false)
+        await loadProfiles()
       }
     } catch (err) {
       setMessage('Erreur réseau : ' + String(err))
@@ -196,13 +194,46 @@ function AdminDashboard() {
     setCreating(false)
 
     if (error) {
-      setMessage("Erreur : " + error.message)
+      setMessage('Erreur : ' + error.message)
       return
     }
 
     setCreatedGalleryId(data.id)
-    setMessage(` Galerie "${title}" créée. Tu peux maintenant uploader des fichiers ci-dessous.`)
-    reloadGalleries()
+    setMessage(`Galerie "${title}" créée. Tu peux maintenant uploader des fichiers ci-dessous.`)
+    loadGalleries()
+  }
+
+  const handleDeleteGallery = async (galleryId: string) => {
+    if (!confirm('Supprimer définitivement cette galerie et tous ses fichiers ?')) return
+
+    setDeletingId(galleryId)
+
+    // 1. Supprimer les fichiers du stockage
+    const { data: filesData } = await supabase
+      .from('gallery_files')
+      .select('file_path')
+      .eq('gallery_id', galleryId)
+
+    if (filesData && filesData.length > 0) {
+      const paths = filesData.map((f) => f.file_path)
+      await supabase.storage.from('galleries').remove(paths)
+    }
+
+    // 2. Supprimer les entrées gallery_files
+    await supabase.from('gallery_files').delete().eq('gallery_id', galleryId)
+
+    // 3. Supprimer la galerie
+    const { error } = await supabase.from('galleries').delete().eq('id', galleryId)
+
+    setDeletingId('')
+
+    if (error) {
+      setMessage('Erreur lors de la suppression : ' + error.message)
+      return
+    }
+
+    setMessage('Galerie supprimée.')
+    loadGalleries()
   }
 
   const handleUpload = async () => {
@@ -228,6 +259,7 @@ function AdminDashboard() {
         continue
       }
 
+      // Miniature (photos uniquement)
       let thumbnailPath: string | null = null
       if (fileType === 'photo') {
         try {
@@ -254,9 +286,10 @@ function AdminDashboard() {
 
     setUploading(false)
     setUploadProgress('')
-    setMessage(` ${successCount}/${files.length} Fichier(s) envoyé(s) avec succès.`)
+    setMessage(`${successCount}/${files.length} fichier(s) envoyé(s) avec succès.`)
     setFiles(null)
   }
+
 
   if (loading) {
     return <p style={{ color: '#fff', padding: '2rem' }}>Chargement...</p>
@@ -269,12 +302,13 @@ function AdminDashboard() {
       <main style={styles.main}>
         <h1 style={styles.title}>Tableau de bord Admin</h1>
 
+        {/* 1. Créer un compte */}
         <section style={styles.card}>
-          <h2 style={styles.cardTitle}>1. Créer un compte client</h2>
+          <h2 style={styles.cardTitle}>1. Créer un compte</h2>
           <form onSubmit={handleCreateClient} style={styles.form}>
             <input
               type="email"
-              placeholder="Email du client"
+              placeholder="Email"
               value={newClientEmail}
               onChange={(e) => setNewClientEmail(e.target.value)}
               required
@@ -289,12 +323,21 @@ function AdminDashboard() {
               minLength={6}
               style={styles.input}
             />
+            <label style={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={newClientIsAdmin}
+                onChange={(e) => setNewClientIsAdmin(e.target.checked)}
+              />
+              Compte administrateur
+            </label>
             <button type="submit" disabled={creatingClient} style={styles.button}>
-              {creatingClient ? 'Création...' : 'Créer le compte client'}
+              {creatingClient ? 'Création...' : 'Créer le compte'}
             </button>
           </form>
         </section>
 
+        {/* 2. Créer une galerie */}
         <section style={styles.card}>
           <h2 style={styles.cardTitle}>2. Créer une galerie</h2>
           <form onSubmit={handleCreateGallery} style={styles.form}>
@@ -306,7 +349,9 @@ function AdminDashboard() {
             >
               <option value="">-- Choisir un client --</option>
               {profiles.map((p) => (
-                <option key={p.id} value={p.id}>{p.email}</option>
+                <option key={p.id} value={p.id}>
+                  {p.email}
+                </option>
               ))}
             </select>
             <input
@@ -330,6 +375,7 @@ function AdminDashboard() {
           </form>
         </section>
 
+        {/* 3. Uploader des fichiers */}
         {createdGalleryId && (
           <section style={styles.card}>
             <h2 style={styles.cardTitle}>3. Uploader des fichiers</h2>
@@ -350,6 +396,7 @@ function AdminDashboard() {
           </section>
         )}
 
+        {/* Galeries existantes */}
         <section style={styles.card}>
           <h2 style={styles.cardTitle}>Galeries existantes</h2>
           {existingGalleries.length === 0 ? (
@@ -386,33 +433,13 @@ function AdminDashboard() {
   )
 }
 
+
 const styles: { [key: string]: React.CSSProperties } = {
   page: {
     minHeight: '100vh',
     background: 'linear-gradient(160deg, #0F172A 0%, #1E1B4B 55%, #2E1065 100%)',
     color: '#FFFFFF',
     fontFamily: 'Inter, sans-serif',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '1.5rem',
-    borderBottom: '1px solid rgba(148, 163, 184, 0.15)',
-  },
-  title: {
-    fontSize: '1.3rem',
-    fontWeight: 800,
-    margin: 0,
-  },
-  logoutButton: {
-    padding: '0.5rem 1.1rem',
-    borderRadius: '8px',
-    border: '1px solid rgba(148, 163, 184, 0.3)',
-    backgroundColor: 'transparent',
-    color: '#FFFFFF',
-    fontSize: '0.85rem',
-    cursor: 'pointer',
   },
   main: {
     maxWidth: '600px',
@@ -421,6 +448,11 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     flexDirection: 'column',
     gap: '1.5rem',
+  },
+  title: {
+    fontSize: '1.3rem',
+    fontWeight: 800,
+    margin: 0,
   },
   card: {
     backgroundColor: 'rgba(30, 27, 75, 0.5)',
@@ -457,6 +489,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     outline: 'none',
     resize: 'vertical',
     fontFamily: 'inherit',
+  },
+  checkboxLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    color: '#94A3B8',
+    fontSize: '0.9rem',
+    cursor: 'pointer',
   },
   fileInput: {
     color: '#94A3B8',

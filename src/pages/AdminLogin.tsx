@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 
-const ADMIN_UID = '1cf86f6f-6561-407f-b5d7-5124846ffdfc'
-
 function AdminLogin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,21 +14,45 @@ function AdminLogin() {
     setErrorMsg('')
     setLoading(true)
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    // 1. Connexion
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    })
 
-    if (error) {
-      setErrorMsg('Email ou mot de passe incorrect.')
+    if (error || !data.user) {
+      // 400 = identifiants incorrects ; autre code = problème technique
+      if (error && error.status && error.status !== 400) {
+        setErrorMsg('Erreur de connexion : ' + error.message)
+      } else {
+        setErrorMsg('Email ou mot de passe incorrect.')
+      }
       setLoading(false)
       return
     }
 
-    if (data.user?.id !== ADMIN_UID) {
+    // 2. Vérification : le compte est-il dans la table des administrateurs ?
+    const { data: adminRow, error: adminError } = await supabase
+      .from('admins')
+      .select('user_id')
+      .eq('user_id', data.user.id)
+      .maybeSingle()
+
+    if (adminError) {
+      setErrorMsg('Erreur de vérification des droits : ' + adminError.message)
+      await supabase.auth.signOut()
+      setLoading(false)
+      return
+    }
+
+    if (!adminRow) {
       setErrorMsg("Ce compte n'a pas les droits administrateur.")
       await supabase.auth.signOut()
       setLoading(false)
       return
     }
 
+    // 3. Accès accordé
     navigate('/admin')
   }
 
