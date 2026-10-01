@@ -67,7 +67,7 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
         ) : (
           <>
             <div className="navbar-desktop-links">
-              <Link to="/portfolio" className="nav-pill" style={{ ...styles.pill, ...(isActive('portfolio') ? styles.pillActive : {}) }}>
+              <Link to="/" className="nav-pill" style={{ ...styles.pill, ...(isActive('portfolio') ? styles.pillActive : {}) }}>
                 Portfolio
               </Link>
               <Link to="/tarifs" className="nav-pill" style={{ ...styles.pill, ...(isActive('tarifs') ? styles.pillActive : {}) }}>
@@ -97,7 +97,7 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
 
       {mode !== 'client' && (
         <div className={`navbar-mobile-menu ${isOpen ? 'open' : ''}`} style={styles.mobileMenu}>
-          <Link to="/portfolio" style={{ ...styles.mobileLink, ...(isActive('portfolio') ? styles.mobileLinkActive : {}) }} onClick={close}>
+          <Link to="/" style={{ ...styles.mobileLink, ...(isActive('portfolio') ? styles.mobileLinkActive : {}) }} onClick={close}>
             Portfolio
           </Link>
           <Link to="/tarifs" style={{ ...styles.mobileLink, ...(isActive('tarifs') ? styles.mobileLinkActive : {}) }} onClick={close}>
@@ -117,10 +117,11 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
 
 const styles: { [key: string]: React.CSSProperties } = {
   nav: {
-    backgroundColor: '#000000',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+    backgroundColor: '#f8f4f418',
+    borderBottom: '1px solid rgba(183, 223, 222, 0.08)',
     flexShrink: 0,
   },
+
   topRow: {
     height: '64px',
     display: 'flex',
@@ -129,6 +130,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '0 1.5rem',
     gap: '1rem',
   },
+
   logo: {
     display: 'flex',
     alignItems: 'center',

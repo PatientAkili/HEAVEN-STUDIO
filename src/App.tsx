@@ -1,12 +1,9 @@
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { supabase } from './lib/supabaseClient'
 import ResetPassword from './pages/ResetPassword'
-import ChangePassword from './pages/ChangePassword'
-import ForgotPassword from './pages/ForgotPassword'
 import Home from './pages/Home'
-import Portfolio from './pages/Portfolio'
 import Tarifs from './pages/Tarifs'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
@@ -62,7 +59,7 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-        <Route path="/portfolio" element={<PageTransition><Portfolio /></PageTransition>} />
+        <Route path="/portfolio" element={<Navigate to="/" replace />} />
         <Route path="/tarifs" element={<PageTransition><Tarifs /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/connexion" element={<PageTransition><Login /></PageTransition>} />
@@ -70,8 +67,6 @@ function AnimatedRoutes() {
         <Route path="/admin/connexion" element={<PageTransition><AdminLogin /></PageTransition>} />
         <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
         <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
-        <Route path="/changer-mot-de-passe" element={<PageTransition><ChangePassword /></PageTransition>} />
-        <Route path="/mot-de-passe-oublie" element={<PageTransition><ForgotPassword /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>

@@ -78,7 +78,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     justifyContent: 'center',
     padding: '1rem',
-    background: 'linear-gradient(160deg, #0F172A 0%, #1E1B4B 55%, #2E1065 100%)',
+    background: 'linear-gradient(160deg, #0a1d55 0%, #1E1B4B 55%, #2E1065 100%)',
   },
   card: {
     width: '100%',
@@ -86,7 +86,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     flexDirection: 'column',
     gap: '1.1rem',
-    backgroundColor: 'rgba(30, 27, 75, 0.55)',
+    backgroundColor: 'rgba(30, 27, 75, 0.05)',
     backdropFilter: 'blur(10px)',
     padding: '2.5rem 2rem',
     borderRadius: '16px',
