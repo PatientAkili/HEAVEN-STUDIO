@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackgroundDecor from '../components/BackgroundDecor'
 
 const categories = ['Toutes', 'Studio', 'Événementiel', 'Design']
 
@@ -25,6 +26,7 @@ function Portfolio() {
 
   return (
     <div style={styles.page}>
+      <BackgroundDecor />
       <style>{`
         @media (max-width: 600px) {
           .portfolio-grid {

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import emailjs from '@emailjs/browser'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackgroundDecor from '../components/BackgroundDecor'
 
 const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
@@ -44,6 +45,7 @@ function Contact() {
 
   return (
     <div style={styles.page}>
+      <BackgroundDecor />
       <style>{`
         @media (max-width: 700px) {
           .contact-grid {

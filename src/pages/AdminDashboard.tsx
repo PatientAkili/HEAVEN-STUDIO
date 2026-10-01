@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackgroundDecor from '../components/BackgroundDecor'
 interface Profile {
   id: string
   email: string
@@ -297,6 +298,7 @@ function AdminDashboard() {
 
   return (
     <div style={styles.page}>
+      <BackgroundDecor />
       <Navbar mode="client" homeTo="/admin" label="Espace Admin" onLogout={handleLogout} />
 
       <main style={styles.main}>

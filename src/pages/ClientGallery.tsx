@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackgroundDecor from '../components/BackgroundDecor'
 
 interface GalleryFile {
   id: string
@@ -107,6 +108,7 @@ function ClientGallery() {
   if (loading) {
     return (
       <div style={styles.page}>
+        <BackgroundDecor />
         <p style={styles.loadingText}>Chargement de vos galeries...</p>
       </div>
     )

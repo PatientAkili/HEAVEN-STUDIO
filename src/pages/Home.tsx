@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BackgroundDecor from '../components/BackgroundDecor'
 
 function Home() {
   return (
     <div className="home-page" style={styles.page}>
+      <BackgroundDecor />
       <style>{`
         .home-page {
           height: 100vh;

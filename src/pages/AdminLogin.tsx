@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import BackgroundDecor from '../components/BackgroundDecor'
 
 function AdminLogin() {
   const [email, setEmail] = useState('')
@@ -58,6 +59,7 @@ function AdminLogin() {
 
   return (
     <div style={styles.container}>
+      <BackgroundDecor />
       <form onSubmit={handleLogin} style={styles.card}>
         <img src="/logo.png" alt="" style={styles.brandLogo} />
         <h1 style={styles.brand}>Espace Admin</h1>

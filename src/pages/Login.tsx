@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import BackgroundDecor from '../components/BackgroundDecor'
 
 function Login() {
   const [email, setEmail] = useState('')
@@ -32,6 +33,7 @@ function Login() {
 
   return (
     <div style={styles.container}>
+      <BackgroundDecor />
       <form onSubmit={handleLogin} style={styles.card}>
         <img src="/logo.png" alt="" style={styles.brandLogo} />
         <h1 style={styles.brand}>HEAVEN ROYAL STUDIO PROD</h1>

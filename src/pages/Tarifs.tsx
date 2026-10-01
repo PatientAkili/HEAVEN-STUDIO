@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { useState } from 'react'
 import Footer from '../components/Footer'
+import BackgroundDecor from '../components/BackgroundDecor'
 
 const offres = [
   {
@@ -30,6 +31,7 @@ function Tarifs() {
 
   return (
     <div className="tarifs-page" style={styles.page}>
+      <BackgroundDecor />
       <style>{`
         .tarifs-page {
           height: 100vh;
