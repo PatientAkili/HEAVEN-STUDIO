@@ -37,6 +37,13 @@ function ClientGallery() {
         return
       }
 
+      // Mot de passe provisoire : le client doit d'abord le changer
+      const { data: userData } = await supabase.auth.getUser()
+      if (userData.user?.user_metadata?.must_change_password) {
+        navigate('/changer-mot-de-passe')
+        return
+      }
+
       setUserEmail(sessionData.session.user.email ?? '')
 
       // 1. Récupérer les galeries du client connecté (RLS filtre déjà automatiquement)
