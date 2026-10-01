@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 
 function Login() {
@@ -14,7 +14,7 @@ function Login() {
     setErrorMsg('')
     setLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
@@ -23,6 +23,8 @@ function Login() {
 
     if (error) {
       setErrorMsg('Email ou mot de passe incorrect.')
+    } else if (data.user?.user_metadata?.must_change_password) {
+      navigate('/changer-mot-de-passe')
     } else {
       navigate('/galerie')
     }
@@ -58,6 +60,10 @@ function Login() {
         <button type="submit" disabled={loading} style={styles.button}>
           {loading ? 'Connexion...' : 'Se connecter'}
         </button>
+
+        <Link to="/mot-de-passe-oublie" style={styles.link}>
+          Mot de passe oublié ?
+        </Link>
       </form>
     </div>
   )
@@ -124,6 +130,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '1rem',
     cursor: 'pointer',
     marginTop: '0.25rem',
+  },
+  link: {
+    color: '#94A3B8',
+    fontSize: '0.85rem',
+    textAlign: 'center',
+    textDecoration: 'underline',
   },
   error: {
     color: '#F87171',

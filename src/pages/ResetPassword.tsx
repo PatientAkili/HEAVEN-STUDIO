@@ -19,20 +19,21 @@ function ResetPassword() {
       setErrorMsg('Les deux mots de passe ne correspondent pas.')
       return
     }
-    if (password.length < 6) {
-      setErrorMsg('Le mot de passe doit faire au moins 6 caractères.')
+    if (password.length < 8) {
+      setErrorMsg('Le mot de passe doit faire au moins 8 caractères.')
       return
     }
 
     setLoading(true)
-    const { error } = await supabase.auth.updateUser({ password })
+    const { error } = await supabase.auth.updateUser({ password, data: { must_change_password: false } })
     setLoading(false)
 
     if (error) {
-      setErrorMsg("Erreur : " + error.message + " (le lien a peut-être expiré, redemande une réinitialisation)")
+      setErrorMsg("Erreur : " + error.message + " (le lien a peut-être expiré, redemandez une réinitialisation)")
     } else {
       setMessage('✅ Mot de passe mis à jour avec succès.')
-      setTimeout(() => navigate('/admin/connexion'), 2000)
+      await supabase.auth.signOut()
+      setTimeout(() => navigate('/connexion'), 2000)
     }
   }
 
@@ -40,7 +41,7 @@ function ResetPassword() {
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={styles.card}>
         <h1 style={styles.brand}>Nouveau mot de passe</h1>
-        <p style={styles.subtitle}>Définis un nouveau mot de passe pour ton compte</p>
+        <p style={styles.subtitle}>Définissez un nouveau mot de passe pour votre compte</p>
 
         <input
           type="password"

@@ -3,6 +3,8 @@ import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { supabase } from './lib/supabaseClient'
 import ResetPassword from './pages/ResetPassword'
+import ChangePassword from './pages/ChangePassword'
+import ForgotPassword from './pages/ForgotPassword'
 import Home from './pages/Home'
 import Portfolio from './pages/Portfolio'
 import Tarifs from './pages/Tarifs'
@@ -68,6 +70,8 @@ function AnimatedRoutes() {
         <Route path="/admin/connexion" element={<PageTransition><AdminLogin /></PageTransition>} />
         <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
         <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
+        <Route path="/changer-mot-de-passe" element={<PageTransition><ChangePassword /></PageTransition>} />
+        <Route path="/mot-de-passe-oublie" element={<PageTransition><ForgotPassword /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
