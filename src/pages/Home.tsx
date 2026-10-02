@@ -57,7 +57,7 @@ function TypedHeroTitle() {
   }, [])
 
   return (
-    <h1 style={styles.heroTitle}>
+    <h1 className="hero-title" style={styles.heroTitle}>
       {displayed}
       <span style={styles.caret}>|</span>
     </h1>
@@ -92,8 +92,11 @@ function Home() {
             grid-template-columns: 1fr !important;
           }
           .intro-photo {
-            max-width: 280px !important;
+            max-width: 160px !important;
             margin: 0 auto;
+          }
+          .hero-title {
+            font-size: 1.7rem !important;
           }
         }
 
