@@ -2,6 +2,16 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from
 import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { supabase } from './lib/supabaseClient'
+
+function getVisitorId() {
+  const key = 'hrs_visitor_id'
+  let id = localStorage.getItem(key)
+  if (!id) {
+    id = crypto.randomUUID()
+    localStorage.setItem(key, id)
+  }
+  return id
+}
 import ResetPassword from './pages/ResetPassword'
 import Home from './pages/Home'
 import Tarifs from './pages/Tarifs'
@@ -30,6 +40,14 @@ function ScrollToTop() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [pathname])
+
+  useEffect(() => {
+    supabase.from('site_visits').insert({
+      visitor_id: getVisitorId(),
+      path: pathname,
+    }).then(() => {})
+  }, [pathname])
+
   return null
 }
 

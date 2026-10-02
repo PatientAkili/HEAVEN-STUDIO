@@ -57,6 +57,8 @@ const generateThumbnail = (file: File, maxSize = 600, quality = 0.75): Promise<B
 }
 
 function AdminDashboard() {
+  const [stats, setStats] = useState({ totalViews: 0, uniqueVisitors: 0, todayViews: 0 })
+
   const navigate = useNavigate()
 
   
@@ -104,6 +106,24 @@ function AdminDashboard() {
   }
 
   
+  useEffect(() => {
+    const loadStats = async () => {
+      const { count: totalViews } = await supabase
+        .from('site_visits')
+        .select('*', { count: 'exact', head: true })
+
+      const { data: allVisits } = await supabase.from('site_visits').select('visitor_id, created_at')
+      const uniqueVisitors = new Set((allVisits ?? []).map((v) => v.visitor_id)).size
+
+      const todayStart = new Date()
+      todayStart.setHours(0, 0, 0, 0)
+      const todayViews = (allVisits ?? []).filter((v) => new Date(v.created_at) >= todayStart).length
+
+      setStats({ totalViews: totalViews ?? 0, uniqueVisitors, todayViews })
+    }
+    loadStats()
+  }, [])
+
   useEffect(() => {
     const checkAccess = async () => {
       // 1. L'utilisateur est-il connecté ?
@@ -302,6 +322,24 @@ function AdminDashboard() {
       <Navbar mode="client" homeTo="/admin" label="Espace Admin" onLogout={handleLogout} />
 
       <main style={styles.main}>
+        <section style={styles.card}>
+          <h2 style={styles.cardTitle}>Statistiques de visite</h2>
+          <div style={styles.statsRow}>
+            <div style={styles.statBox}>
+              <p style={styles.statNumber}>{stats.totalViews}</p>
+              <p style={styles.statLabel}>Vues totales</p>
+            </div>
+            <div style={styles.statBox}>
+              <p style={styles.statNumber}>{stats.uniqueVisitors}</p>
+              <p style={styles.statLabel}>Visiteurs uniques</p>
+            </div>
+            <div style={styles.statBox}>
+              <p style={styles.statNumber}>{stats.todayViews}</p>
+              <p style={styles.statLabel}>Vues aujourd'hui</p>
+            </div>
+          </div>
+        </section>
+
         <h1 style={styles.title}>Tableau de bord Admin</h1>
 
         {/* 1. Créer un compte */}
@@ -552,6 +590,28 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '0.8rem',
     cursor: 'pointer',
     flexShrink: 0,
+  },
+  statsRow: {
+    display: 'flex',
+    gap: '1rem',
+    flexWrap: 'wrap',
+  },
+  statBox: {
+    flex: '1 1 140px',
+    textAlign: 'center',
+    padding: '1rem',
+    borderRadius: '10px',
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+  },
+  statNumber: {
+    fontSize: '1.8rem',
+    fontWeight: 800,
+    margin: '0 0 0.25rem 0',
+  },
+  statLabel: {
+    fontSize: '0.8rem',
+    color: '#94A3B8',
+    margin: 0,
   },
   message: {
     textAlign: 'center',
