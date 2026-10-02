@@ -117,8 +117,13 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
 
 const styles: { [key: string]: React.CSSProperties } = {
   nav: {
-    backgroundColor: '#f8f4f418',
-    borderBottom: '1px solid rgba(183, 223, 222, 0.08)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+    backgroundColor: 'rgba(14, 116, 144, 0.18)',
+    backdropFilter: 'blur(14px)',
+    WebkitBackdropFilter: 'blur(14px)',
+    borderBottom: '1px solid rgba(165, 243, 252, 0.15)',
     flexShrink: 0,
   },
 

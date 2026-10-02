@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import BackgroundDecor from '../components/BackgroundDecor'
@@ -18,6 +18,51 @@ const works: Work[] = Array.from({ length: 12 }, (_, i) => ({
   title: `Design ${i + 1}`,
   category: 'Design',
 }))
+
+
+const FULL_TITLE = "Capturer vos moments, révéler votre histoire"
+
+function TypedHeroTitle() {
+  const [displayed, setDisplayed] = useState('')
+
+  useEffect(() => {
+    let i = 0
+    let deleting = false
+    let timeoutId: ReturnType<typeof setTimeout>
+
+    const tick = () => {
+      if (!deleting) {
+        i++
+        setDisplayed(FULL_TITLE.slice(0, i))
+        if (i >= FULL_TITLE.length) {
+          deleting = true
+          timeoutId = setTimeout(tick, 2200)
+          return
+        }
+        timeoutId = setTimeout(tick, 45)
+      } else {
+        i--
+        setDisplayed(FULL_TITLE.slice(0, i))
+        if (i <= 0) {
+          deleting = false
+          timeoutId = setTimeout(tick, 500)
+          return
+        }
+        timeoutId = setTimeout(tick, 25)
+      }
+    }
+
+    timeoutId = setTimeout(tick, 45)
+    return () => clearTimeout(timeoutId)
+  }, [])
+
+  return (
+    <h1 style={styles.heroTitle}>
+      {displayed}
+      <span style={styles.caret}>|</span>
+    </h1>
+  )
+}
 
 function Home() {
   const [activeCategory, setActiveCategory] = useState('Toutes')
@@ -41,6 +86,7 @@ function Home() {
             grid-template-columns: repeat(2, 1fr) !important;
           }
         }
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
         @media (max-width: 700px) {
           .intro-grid {
             grid-template-columns: 1fr !important;
@@ -103,9 +149,7 @@ function Home() {
       <Navbar active="portfolio" />
 
       <section style={styles.hero}>
-        <h1 style={styles.heroTitle}>
-          Capturer vos moments, révéler votre histoire
-        </h1>
+        <TypedHeroTitle />
         <p style={styles.heroSubtitle}>
           Studio photo & vidéo professionnel — portraits, événements, mode et bien plus.
         </p>
@@ -227,10 +271,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     margin: '0 auto',
   },
   heroTitle: {
+    fontFamily: "'Space Grotesk', sans-serif",
     fontSize: 'clamp(3rem, 5vw, 3.5rem)',
     fontWeight: 800,
     lineHeight: 1.2,
     margin: '0 0 1.5rem 0',
+  },
+  caret: {
+    display: 'inline-block',
+    animation: 'blink 0.9s steps(1) infinite',
   },
   heroSubtitle: {
     color: '#94A3B8',
