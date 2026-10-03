@@ -64,6 +64,18 @@ function TypedHeroTitle() {
   )
 }
 
+const stats = [
+  { value: '+50', label: 'Séances réalisées' },
+  { value: '+30', label: 'Clients satisfaits' },
+  { value: '3', label: "Années d'expérience" },
+]
+
+const testimonials = [
+  { quote: "Un travail d'une grande qualité, et une équipe très professionnelle du début à la fin.", name: 'Client — Séance Studio' },
+  { quote: "Les photos ont dépassé mes attentes, vraiment un excellent accompagnement.", name: 'Client — Événementiel' },
+  { quote: "Rapide, soigné, et à l'écoute de nos besoins pour notre projet.", name: 'Client — Design' },
+]
+
 function Home() {
   const [activeCategory, setActiveCategory] = useState('Toutes')
   const [selected, setSelected] = useState<Work | null>(null)
@@ -249,6 +261,28 @@ function Home() {
         </div>
       )}
 
+      <section style={styles.statsSection}>
+        {stats.map((s) => (
+          <div key={s.label} style={styles.statItem}>
+            <p style={styles.statNumber}>{s.value}</p>
+            <p style={styles.statLabel}>{s.label}</p>
+          </div>
+        ))}
+      </section>
+
+      <section style={styles.testimonialsSection}>
+        <h2 style={styles.testimonialsTitle}>Ce que disent nos clients</h2>
+        <div style={styles.testimonialsGrid}>
+          {testimonials.map((t) => (
+            <div key={t.name} style={styles.testimonialCard}>
+              <p style={styles.testimonialQuote}>"{t.quote}"</p>
+              <p style={styles.testimonialName}>{t.name}</p>
+            </div>
+          ))}
+        </div>
+        <p style={styles.testimonialsNote}>* Exemples illustratifs — en attente de vrais témoignages clients</p>
+      </section>
+
       <Footer />
     </div>
   )
@@ -312,6 +346,72 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#FFFFFF',
     textDecoration: 'none',
     fontWeight: 600,
+  },
+  statsSection: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '2.5rem',
+    flexWrap: 'wrap',
+    padding: '2rem 1.5rem',
+    maxWidth: '900px',
+    margin: '0 auto',
+  },
+  statItem: {
+    textAlign: 'center',
+  },
+  statNumber: {
+    fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+    fontWeight: 800,
+    margin: 0,
+    background: 'linear-gradient(90deg, #3B82F6 0%, #9333EA 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+  },
+  statLabel: {
+    fontSize: '0.85rem',
+    color: '#94A3B8',
+    margin: '0.25rem 0 0 0',
+  },
+  testimonialsSection: {
+    padding: '2rem 1.5rem 3rem',
+    maxWidth: '1100px',
+    margin: '0 auto',
+    textAlign: 'center',
+  },
+  testimonialsTitle: {
+    fontSize: 'clamp(1.4rem, 3vw, 1.9rem)',
+    fontWeight: 800,
+    margin: '0 0 1.5rem 0',
+  },
+  testimonialsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+    gap: '1.25rem',
+  },
+  testimonialCard: {
+    backgroundColor: 'rgba(30, 27, 75, 0.5)',
+    border: '1px solid rgba(148, 163, 184, 0.15)',
+    borderRadius: '14px',
+    padding: '1.5rem',
+    textAlign: 'left',
+  },
+  testimonialQuote: {
+    color: '#CBD5E1',
+    fontSize: '0.9rem',
+    lineHeight: 1.6,
+    margin: '0 0 1rem 0',
+    fontStyle: 'italic',
+  },
+  testimonialName: {
+    color: '#A78BFA',
+    fontSize: '0.85rem',
+    fontWeight: 600,
+    margin: 0,
+  },
+  testimonialsNote: {
+    color: '#64748B',
+    fontSize: '0.75rem',
+    marginTop: '1.5rem',
   },
   intro: {
     display: 'grid',

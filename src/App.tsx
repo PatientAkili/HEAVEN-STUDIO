@@ -21,6 +21,9 @@ import ClientGallery from './pages/ClientGallery'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import NotFound from './pages/NotFound'
+import MentionsLegales from './pages/MentionsLegales'
+import PolitiqueConfidentialite from './pages/PolitiqueConfidentialite'
+import WhatsAppButton from './components/WhatsAppButton'
 
 function AuthRecoveryWatcher() {
   const navigate = useNavigate()
@@ -85,6 +88,8 @@ function AnimatedRoutes() {
         <Route path="/admin/connexion" element={<PageTransition><AdminLogin /></PageTransition>} />
         <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
         <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
+        <Route path="/mentions-legales" element={<PageTransition><MentionsLegales /></PageTransition>} />
+        <Route path="/confidentialite" element={<PageTransition><PolitiqueConfidentialite /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
@@ -97,6 +102,7 @@ function App() {
       <AuthRecoveryWatcher />
       <ScrollToTop />
       <AnimatedRoutes />
+      <WhatsAppButton />
     </BrowserRouter>
   )
 }

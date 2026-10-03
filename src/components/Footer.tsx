@@ -36,6 +36,11 @@ function Footer() {
       </div>
 
       <p style={styles.copy}>© {new Date().getFullYear()} HEAVEN ROYAL STUDIO PROD</p>
+      <p style={styles.legalLinks}>
+        <a href="/mentions-legales" style={styles.legalLink}>Mentions légales</a>
+        {' · '}
+        <a href="/confidentialite" style={styles.legalLink}>Confidentialité</a>
+      </p>
     </footer>
   )
 }
@@ -63,6 +68,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '50%',
     border: '1px solid rgba(148, 163, 184, 0.25)',
     transition: 'transform 0.2s ease, background-color 0.2s ease',
+  },
+  legalLinks: {
+    margin: '0.4rem 0 0 0',
+    fontSize: '0.7rem',
+  },
+  legalLink: {
+    color: '#64748B',
+    textDecoration: 'underline',
   },
   copy: {
     color: '#64748B',
