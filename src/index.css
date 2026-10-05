@@ -7,3 +7,59 @@ html, body {
 * {
   box-sizing: border-box;
 }
+
+/* ===== Carte développeur : photo réduite + responsive ===== */
+.dev-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 32px !important;
+}
+
+.dev-photo {
+  width: 110px !important;
+  height: 110px !important;
+  min-width: 110px !important;
+  max-width: 110px !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+}
+
+/* Tablette */
+@media (max-width: 768px) {
+  .dev-photo {
+    width: 90px !important;
+    height: 90px !important;
+    min-width: 90px !important;
+    max-width: 90px !important;
+  }
+}
+
+/* Mobile : photo centrée au-dessus du texte */
+@media (max-width: 600px) {
+  .dev-card {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 18px !important;
+  }
+  .dev-photo {
+    width: 80px !important;
+    height: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+  }
+  .dev-card a {
+    word-break: break-word;
+  }
+}
+
+.dev-card > div {
+  padding-left: 12px !important;
+}
+
+@media (max-width: 600px) {
+  .dev-card > div {
+    padding-left: 0 !important;
+  }
+}

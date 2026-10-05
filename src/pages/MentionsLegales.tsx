@@ -48,6 +48,32 @@ function MentionsLegales() {
             se fait sous la responsabilité de l'utilisateur.
           </p>
         </section>
+
+        <section style={styles.devSection}>
+          <h2 style={styles.h2}>Développement du site</h2>
+          <div className="dev-card" style={styles.devCard}>
+            <img src="/team/patient-akili.jpg" alt="Akili Cirhonde Patient" className="dev-photo" style={styles.devPhoto} />
+            <div style={styles.devInfo}>
+            <p style={styles.devName}>AKILI CIRHONDE PATIENT</p>
+            <p style={styles.devRole}>
+              Ingénieur en Génie et Gestion des Télécommunications<br />
+              Spécialisation Systèmes et Sécurité Réseaux
+            </p>
+            <p style={styles.devPassion}>Passionné par le développement web</p>
+            <div style={styles.devContacts}>
+              <a href="https://wa.me/243979209489" target="_blank" rel="noopener noreferrer" style={styles.devLink}>
+                WhatsApp (RDC) +243 979 209 489
+              </a>
+              <a href="https://wa.me/25762321978" target="_blank" rel="noopener noreferrer" style={styles.devLink}>
+                WhatsApp (Burundi) +257 62 321 978
+              </a>
+              <a href="mailto:patientakili78@icloud.com" style={styles.devLink}>
+                patientakili78@icloud.com
+              </a>
+            </div>
+          </div>
+        </div>
+        </section>
       </main>
       <Footer />
     </div>
@@ -83,6 +109,44 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: 700,
     marginBottom: '0.75rem',
     color: '#A78BFA',
+  },
+  devSection: {
+    marginBottom: '2rem',
+  },
+  devCard: {
+    backgroundColor: 'rgba(30, 27, 75, 0.5)',
+    border: '1px solid rgba(167, 139, 250, 0.3)',
+    borderRadius: '14px',
+    padding: '1.5rem',
+  },
+  devName: {
+    fontSize: '1.15rem',
+    fontWeight: 800,
+    color: '#FFFFFF',
+    margin: '0 0 0.4rem 0',
+    letterSpacing: '0.02em',
+  },
+  devRole: {
+    color: '#C4B5FD',
+    fontSize: '0.88rem',
+    lineHeight: 1.6,
+    margin: '0 0 0.5rem 0',
+  },
+  devPassion: {
+    color: '#94A3B8',
+    fontSize: '0.85rem',
+    fontStyle: 'italic',
+    margin: '0 0 1rem 0',
+  },
+  devContacts: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.4rem',
+  },
+  devLink: {
+    color: '#93C5FD',
+    fontSize: '0.85rem',
+    textDecoration: 'none',
   },
   p: {
     color: '#CBD5E1',
