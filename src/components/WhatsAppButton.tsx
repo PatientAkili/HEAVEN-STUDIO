@@ -6,9 +6,15 @@ function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contacter sur WhatsApp"
+      className="wa-float-btn"
       style={styles.button}
     >
       <style>{`
+        @media (max-width: 720px) {
+          .wa-float-btn {
+            bottom: 86px !important;
+          }
+        }
         .wa-float-btn {
           animation: waPulse 2.5s ease-in-out infinite;
         }

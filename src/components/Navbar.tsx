@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { createPortal } from 'react-dom'
 
 interface NavbarProps {
   active?: 'accueil' | 'portfolio' | 'tarifs' | 'contact'
@@ -9,10 +9,49 @@ interface NavbarProps {
   label?: string
 }
 
+function PortfolioIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <path d="M21 15l-5-5L5 21" />
+    </svg>
+  )
+}
+function TarifsIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3.17H4a1 1 0 0 0-1 1v5.59a2 2 0 0 0 .59 1.41l9.59 9.59a2 2 0 0 0 2.83 0l5-5a2 2 0 0 0 0-2.83Z" />
+      <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+function ContactIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m22 7-10 6L2 7" />
+    </svg>
+  )
+}
+function UserIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
+    </svg>
+  )
+}
+
 function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProps) {
-  const [isOpen, setIsOpen] = useState(false)
   const isActive = (key: string) => active === key
-  const close = () => setIsOpen(false)
+
+  const bottomNavItems = [
+    { to: '/', key: 'portfolio', label: 'Portfolio', Icon: PortfolioIcon, color: '#60A5FA' },
+    { to: '/tarifs', key: 'tarifs', label: 'Tarifs', Icon: TarifsIcon, color: '#FBBF24' },
+    { to: '/contact', key: 'contact', label: 'Contact', Icon: ContactIcon, color: '#34D399' },
+    { to: '/connexion', key: 'client', label: 'Espace', Icon: UserIcon, color: '#C084FC' },
+  ]
 
   return (
     <nav style={styles.nav}>
@@ -34,10 +73,7 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
           align-items: center;
           gap: 0.75rem;
         }
-        .navbar-hamburger {
-          display: none;
-        }
-        .navbar-mobile-menu {
+        .bottom-glass-nav {
           display: none;
         }
 
@@ -45,17 +81,21 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
           .navbar-desktop-links {
             display: none;
           }
-          .navbar-hamburger {
+          .bottom-glass-nav {
             display: flex;
           }
-          .navbar-mobile-menu.open {
-            display: flex;
-          }
+        }
+
+        .bottom-glass-item {
+          transition: transform 0.2s ease, color 0.2s ease;
+        }
+        .bottom-glass-item:active {
+          transform: scale(0.92);
         }
       `}</style>
 
       <div style={styles.topRow}>
-        <Link to={homeTo ?? (mode === 'client' ? '/galerie' : '/')} style={styles.logo} onClick={close}>
+        <Link to={homeTo ?? (mode === 'client' ? '/galerie' : '/')} style={styles.logo}>
           <img src="/logo.png" alt="" style={styles.logoImg} />
           <span style={styles.logoText}>{label ?? 'HEAVEN ROYAL STUDIO PROD'}</span>
         </Link>
@@ -65,52 +105,45 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
             Déconnexion
           </button>
         ) : (
-          <>
-            <div className="navbar-desktop-links">
-              <Link to="/" className="nav-pill" style={{ ...styles.pill, ...(isActive('portfolio') ? styles.pillActive : {}) }}>
-                Portfolio
-              </Link>
-              <Link to="/tarifs" className="nav-pill" style={{ ...styles.pill, ...(isActive('tarifs') ? styles.pillActive : {}) }}>
-                Tarifs
-              </Link>
-              <Link to="/contact" className="nav-pill" style={{ ...styles.pill, ...(isActive('contact') ? styles.pillActive : {}) }}>
-                Contact
-              </Link>
-              <Link to="/connexion" className="nav-pill" style={styles.pill}>
-                Espace Client
-              </Link>
-            </div>
-
-            <button
-              className="navbar-hamburger"
-              onClick={() => setIsOpen(!isOpen)}
-              style={styles.hamburgerButton}
-              aria-label="Menu"
-            >
-              <span style={{ ...styles.bar, transform: isOpen ? 'translateY(7px) rotate(45deg)' : 'none' }} />
-              <span style={{ ...styles.bar, opacity: isOpen ? 0 : 1 }} />
-              <span style={{ ...styles.bar, transform: isOpen ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
-            </button>
-          </>
+          <div className="navbar-desktop-links">
+            <Link to="/" className="nav-pill" style={{ ...styles.pill, ...(isActive('portfolio') ? styles.pillActive : {}) }}>
+              Portfolio
+            </Link>
+            <Link to="/tarifs" className="nav-pill" style={{ ...styles.pill, ...(isActive('tarifs') ? styles.pillActive : {}) }}>
+              Tarifs
+            </Link>
+            <Link to="/contact" className="nav-pill" style={{ ...styles.pill, ...(isActive('contact') ? styles.pillActive : {}) }}>
+              Contact
+            </Link>
+            <Link to="/connexion" className="nav-pill" style={styles.pill}>
+              Espace Client
+            </Link>
+          </div>
         )}
       </div>
 
-      {mode !== 'client' && (
-        <div className={`navbar-mobile-menu ${isOpen ? 'open' : ''}`} style={styles.mobileMenu}>
-          <Link to="/" style={{ ...styles.mobileLink, ...(isActive('portfolio') ? styles.mobileLinkActive : {}) }} onClick={close}>
-            Portfolio
-          </Link>
-          <Link to="/tarifs" style={{ ...styles.mobileLink, ...(isActive('tarifs') ? styles.mobileLinkActive : {}) }} onClick={close}>
-            Tarifs
-          </Link>
-          <Link to="/contact" style={{ ...styles.mobileLink, ...(isActive('contact') ? styles.mobileLinkActive : {}) }} onClick={close}>
-            Contact
-          </Link>
-          <Link to="/connexion" className="nav-pill" style={{ ...styles.pill, textAlign: 'center' }} onClick={close}>
-            Espace Client
-          </Link>
-        </div>
-      )}
+      {mode !== 'client' &&
+        createPortal(
+          <div className="bottom-glass-nav" style={styles.bottomGlassNav}>
+            {bottomNavItems.map(({ to, key, label: itemLabel, Icon, color }) => (
+              <Link
+                key={key}
+                to={to}
+                className="bottom-glass-item"
+                style={{
+                  ...styles.bottomGlassItem,
+                  color: isActive(key) ? color : `${color}99`,
+                  backgroundColor: isActive(key) ? `${color}22` : 'transparent',
+                }}
+              >
+                <Icon />
+                <span style={styles.bottomGlassLabel}>{itemLabel}</span>
+                {isActive(key) && <span style={{ ...styles.bottomGlassDot, backgroundColor: color }} />}
+              </Link>
+            ))}
+          </div>,
+          document.body
+        )}
     </nav>
   )
 }
@@ -180,39 +213,43 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: 600,
     cursor: 'pointer',
   },
-  hamburgerButton: {
+  bottomGlassNav: {
+    position: 'fixed',
+    bottom: '14px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 150,
+    display: 'flex',
+    gap: '0.4rem',
+    padding: '0.6rem 0.9rem',
+    borderRadius: '999px',
+    backgroundColor: 'rgba(30, 27, 75, 0.55)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    border: '1px solid rgba(255,255,255,0.15)',
+    boxShadow: '0 10px 40px rgba(0,0,0,0.45)',
+  },
+  bottomGlassItem: {
+    position: 'relative',
+    display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
     alignItems: 'center',
-    gap: '5px',
-    width: '36px',
-    height: '36px',
-    background: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    flexShrink: 0,
-  },
-  bar: {
-    width: '22px',
-    height: '2px',
-    backgroundColor: '#FFFFFF',
-    transition: 'transform 0.25s ease, opacity 0.25s ease',
-  },
-  mobileMenu: {
-    flexDirection: 'column',
-    padding: '0.5rem 1.5rem 1.25rem',
-    gap: '0.5rem',
-    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-  },
-  mobileLink: {
-    color: '#94A3B8',
+    gap: '0.15rem',
     textDecoration: 'none',
-    fontSize: '0.95rem',
-    padding: '0.6rem 0.25rem',
+    padding: '0.35rem 0.7rem',
+    borderRadius: '14px',
   },
-  mobileLinkActive: {
-    color: '#FFFFFF',
-    fontWeight: 700,
+  bottomGlassLabel: {
+    fontSize: '0.6rem',
+    fontWeight: 600,
+  },
+  bottomGlassDot: {
+    position: 'absolute',
+    bottom: '-6px',
+    width: '4px',
+    height: '4px',
+    borderRadius: '50%',
+    backgroundColor: '#C4B5FD',
   },
 }
 
