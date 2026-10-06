@@ -1,6 +1,14 @@
 function Footer() {
   return (
-    <footer style={styles.footer}>
+    <>
+      <style>{`
+        @media (max-width: 720px) {
+          .site-footer {
+            padding-bottom: 7rem !important;
+          }
+        }
+      `}</style>
+    <footer className="site-footer" style={styles.footer}>
       <div style={styles.socials}>
         <a href="https://google.com" target="_blank" rel="noopener noreferrer" style={{ ...styles.iconLink, borderColor: 'rgba(66,133,244,0.4)' }} aria-label="Google">
           <svg width="24" height="24" viewBox="0 0 24 24">
@@ -42,6 +50,7 @@ function Footer() {
         <a href="/confidentialite" style={styles.legalLink}>Confidentialité</a>
       </p>
     </footer>
+    </>
   )
 }
 

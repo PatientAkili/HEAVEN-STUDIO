@@ -219,7 +219,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: '50%',
     transform: 'translateX(-50%)',
     zIndex: 150,
-    display: 'flex',
     gap: '0.4rem',
     padding: '0.6rem 0.9rem',
     borderRadius: '999px',
