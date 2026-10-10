@@ -319,7 +319,7 @@ function AdminDashboard() {
   return (
     <div style={styles.page}>
       <BackgroundDecor />
-      <Navbar mode="client" homeTo="/admin" label="Espace Admin" onLogout={handleLogout} />
+      <Navbar mode="admin" homeTo="/admin" label="Espace Admin" onLogout={handleLogout} />
 
       <main style={styles.main}>
         <section style={styles.card}>

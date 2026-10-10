@@ -1,14 +1,21 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { createPortal } from 'react-dom'
 
 interface NavbarProps {
   active?: 'accueil' | 'portfolio' | 'tarifs' | 'contact'
-  mode?: 'public' | 'client'
+  mode?: 'public' | 'client' | 'admin'
   onLogout?: () => void
   homeTo?: string
   label?: string
 }
 
+function HomeIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z" />
+    </svg>
+  )
+}
 function PortfolioIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -42,16 +49,52 @@ function UserIcon() {
     </svg>
   )
 }
+function PlusIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  )
+}
+function DashboardIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="3" width="7" height="9" rx="1" />
+      <rect x="14" y="3" width="7" height="5" rx="1" />
+      <rect x="14" y="12" width="7" height="9" rx="1" />
+      <rect x="3" y="16" width="7" height="5" rx="1" />
+    </svg>
+  )
+}
+
+interface BottomItem {
+  to: string
+  key: string
+  label: string
+  Icon: () => React.ReactElement
+  color: string
+  highlight?: boolean
+}
+
+const publicBottomItems: BottomItem[] = [
+  { to: '/', key: 'portfolio', label: 'Portfolio', Icon: PortfolioIcon, color: '#60A5FA' },
+  { to: '/tarifs', key: 'tarifs', label: 'Tarifs', Icon: TarifsIcon, color: '#FBBF24' },
+  { to: '/contact', key: 'contact', label: 'Contact', Icon: ContactIcon, color: '#34D399' },
+  { to: '/connexion', key: 'client', label: 'Espace', Icon: UserIcon, color: '#C084FC' },
+]
+
+const adminBottomItems: BottomItem[] = [
+  { to: '/', key: 'home', label: 'Accueil', Icon: HomeIcon, color: '#60A5FA' },
+  { to: '/tarifs', key: 'tarifs', label: 'Tarifs', Icon: TarifsIcon, color: '#FBBF24' },
+  { to: '/admin/publications', key: 'publish', label: 'Publier', Icon: PlusIcon, color: '#F472B6', highlight: true },
+  { to: '/contact', key: 'contact', label: 'Contact', Icon: ContactIcon, color: '#34D399' },
+  { to: '/admin', key: 'dashboard', label: 'Admin', Icon: DashboardIcon, color: '#C084FC' },
+]
 
 function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProps) {
+  const { pathname } = useLocation()
   const isActive = (key: string) => active === key
-
-  const bottomNavItems = [
-    { to: '/', key: 'portfolio', label: 'Portfolio', Icon: PortfolioIcon, color: '#60A5FA' },
-    { to: '/tarifs', key: 'tarifs', label: 'Tarifs', Icon: TarifsIcon, color: '#FBBF24' },
-    { to: '/contact', key: 'contact', label: 'Contact', Icon: ContactIcon, color: '#34D399' },
-    { to: '/connexion', key: 'client', label: 'Espace', Icon: UserIcon, color: '#C084FC' },
-  ]
+  const bottomItems = mode === 'admin' ? adminBottomItems : publicBottomItems
 
   return (
     <nav style={styles.nav}>
@@ -95,16 +138,12 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
       `}</style>
 
       <div style={styles.topRow}>
-        <Link to={homeTo ?? (mode === 'client' ? '/galerie' : '/')} style={styles.logo}>
+        <Link to={homeTo ?? (mode === 'public' ? '/' : mode === 'admin' ? '/admin' : '/galerie')} style={styles.logo}>
           <img src="/logo.png" alt="" style={styles.logoImg} />
           <span style={styles.logoText}>{label ?? 'HEAVEN ROYAL STUDIO PROD'}</span>
         </Link>
 
-        {mode === 'client' ? (
-          <button onClick={onLogout} className="nav-pill" style={styles.pillButton}>
-            Déconnexion
-          </button>
-        ) : (
+        {mode === 'public' && (
           <div className="navbar-desktop-links">
             <Link to="/" className="nav-pill" style={{ ...styles.pill, ...(isActive('portfolio') ? styles.pillActive : {}) }}>
               Portfolio
@@ -120,27 +159,66 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
             </Link>
           </div>
         )}
+
+        {mode === 'admin' && (
+          <div style={styles.rightGroup}>
+            <div className="navbar-desktop-links">
+              <Link to="/" className="nav-pill" style={styles.pill}>Voir le site</Link>
+              <Link to="/admin/publications" className="nav-pill" style={{ ...styles.pill, ...(pathname === '/admin/publications' ? styles.pillActive : {}) }}>
+                Publications
+              </Link>
+              <Link to="/admin" className="nav-pill" style={{ ...styles.pill, ...(pathname === '/admin' ? styles.pillActive : {}) }}>
+                Tableau de bord
+              </Link>
+            </div>
+            <button onClick={onLogout} className="nav-pill" style={styles.pillButton}>
+              Déconnexion
+            </button>
+          </div>
+        )}
+
+        {mode === 'client' && (
+          <button onClick={onLogout} className="nav-pill" style={styles.pillButton}>
+            Déconnexion
+          </button>
+        )}
       </div>
 
       {mode !== 'client' &&
         createPortal(
           <div className="bottom-glass-nav" style={styles.bottomGlassNav}>
-            {bottomNavItems.map(({ to, key, label: itemLabel, Icon, color }) => (
-              <Link
-                key={key}
-                to={to}
-                className="bottom-glass-item"
-                style={{
-                  ...styles.bottomGlassItem,
-                  color: isActive(key) ? color : `${color}99`,
-                  backgroundColor: isActive(key) ? `${color}22` : 'transparent',
-                }}
-              >
-                <Icon />
-                <span style={styles.bottomGlassLabel}>{itemLabel}</span>
-                {isActive(key) && <span style={{ ...styles.bottomGlassDot, backgroundColor: color }} />}
-              </Link>
-            ))}
+            {bottomItems.map(({ to, key, label: itemLabel, Icon, color, highlight }) => {
+              const current = pathname === to
+              if (highlight) {
+                return (
+                  <Link
+                    key={key}
+                    to={to}
+                    className="bottom-glass-item"
+                    style={{ ...styles.bottomGlassItem, ...styles.bottomGlassHighlight, boxShadow: `0 6px 18px ${color}66` }}
+                  >
+                    <Icon />
+                    <span style={styles.bottomGlassLabel}>{itemLabel}</span>
+                  </Link>
+                )
+              }
+              return (
+                <Link
+                  key={key}
+                  to={to}
+                  className="bottom-glass-item"
+                  style={{
+                    ...styles.bottomGlassItem,
+                    color: current ? color : `${color}99`,
+                    backgroundColor: current ? `${color}22` : 'transparent',
+                  }}
+                >
+                  <Icon />
+                  <span style={styles.bottomGlassLabel}>{itemLabel}</span>
+                  {current && <span style={{ ...styles.bottomGlassDot, backgroundColor: color }} />}
+                </Link>
+              )
+            })}
           </div>,
           document.body
         )}
@@ -190,6 +268,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  rightGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+    flexShrink: 0,
+  },
   pill: {
     padding: '0.45rem 1.1rem',
     borderRadius: '999px',
@@ -219,8 +303,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: '50%',
     transform: 'translateX(-50%)',
     zIndex: 150,
-    gap: '0.4rem',
-    padding: '0.6rem 0.9rem',
+    gap: '0.25rem',
+    maxWidth: 'calc(100vw - 16px)',
+    padding: '0.6rem 0.8rem',
     borderRadius: '999px',
     backgroundColor: 'rgba(30, 27, 75, 0.55)',
     backdropFilter: 'blur(16px)',
@@ -235,8 +320,13 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     gap: '0.15rem',
     textDecoration: 'none',
-    padding: '0.35rem 0.7rem',
+    padding: '0.35rem 0.55rem',
     borderRadius: '14px',
+  },
+  bottomGlassHighlight: {
+    background: 'linear-gradient(135deg, #3B82F6 0%, #9333EA 100%)',
+    color: '#FFFFFF',
+    transform: 'translateY(-8px)',
   },
   bottomGlassLabel: {
     fontSize: '0.6rem',
@@ -248,7 +338,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '4px',
     height: '4px',
     borderRadius: '50%',
-    backgroundColor: '#C4B5FD',
   },
 }
 

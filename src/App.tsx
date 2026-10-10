@@ -23,6 +23,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import NotFound from './pages/NotFound'
 import MentionsLegales from './pages/MentionsLegales'
 import PolitiqueConfidentialite from './pages/PolitiqueConfidentialite'
+import AdminPosts from './pages/AdminPosts'
 import WhatsAppButton from './components/WhatsAppButton'
 
 function AuthRecoveryWatcher() {
@@ -87,6 +88,7 @@ function AnimatedRoutes() {
         <Route path="/galerie" element={<PageTransition><ClientGallery /></PageTransition>} />
         <Route path="/admin/connexion" element={<PageTransition><AdminLogin /></PageTransition>} />
         <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
+        <Route path="/admin/publications" element={<PageTransition><AdminPosts /></PageTransition>} />
         <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
         <Route path="/mentions-legales" element={<PageTransition><MentionsLegales /></PageTransition>} />
         <Route path="/confidentialite" element={<PageTransition><PolitiqueConfidentialite /></PageTransition>} />
