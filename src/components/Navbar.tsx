@@ -67,6 +67,15 @@ function DashboardIcon() {
   )
 }
 
+function EditIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  )
+}
+
 interface BottomItem {
   to: string
   key: string
@@ -87,7 +96,7 @@ const adminBottomItems: BottomItem[] = [
   { to: '/', key: 'home', label: 'Accueil', Icon: HomeIcon, color: '#60A5FA' },
   { to: '/tarifs', key: 'tarifs', label: 'Tarifs', Icon: TarifsIcon, color: '#FBBF24' },
   { to: '/admin/publications', key: 'publish', label: 'Publier', Icon: PlusIcon, color: '#F472B6', highlight: true },
-  { to: '/contact', key: 'contact', label: 'Contact', Icon: ContactIcon, color: '#34D399' },
+  { to: '/admin/contenu', key: 'content', label: 'Contenu', Icon: EditIcon, color: '#34D399' },
   { to: '/admin', key: 'dashboard', label: 'Admin', Icon: DashboardIcon, color: '#C084FC' },
 ]
 
@@ -166,6 +175,9 @@ function Navbar({ active, mode = 'public', onLogout, homeTo, label }: NavbarProp
               <Link to="/" className="nav-pill" style={styles.pill}>Voir le site</Link>
               <Link to="/admin/publications" className="nav-pill" style={{ ...styles.pill, ...(pathname === '/admin/publications' ? styles.pillActive : {}) }}>
                 Publications
+              </Link>
+              <Link to="/admin/contenu" className="nav-pill" style={{ ...styles.pill, ...(pathname === '/admin/contenu' ? styles.pillActive : {}) }}>
+                Contenu
               </Link>
               <Link to="/admin" className="nav-pill" style={{ ...styles.pill, ...(pathname === '/admin' ? styles.pillActive : {}) }}>
                 Tableau de bord

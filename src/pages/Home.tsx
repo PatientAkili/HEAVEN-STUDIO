@@ -3,9 +3,8 @@ import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import BackgroundDecor from '../components/BackgroundDecor'
+import { supabase } from '../lib/supabaseClient'
 import PostsFeed from '../components/PostsFeed'
-
-const categories = ['Toutes', 'Studio', 'Événementiel', 'Design']
 
 interface Work {
   src: string
@@ -14,7 +13,7 @@ interface Work {
 }
 
 // Pour ajouter une réalisation : copie l'image dans public/team/, puis ajoute une ligne ici.
-const works: Work[] = Array.from({ length: 12 }, (_, i) => ({
+const fallbackWorks: Work[] = Array.from({ length: 12 }, (_, i) => ({
   src: `/team/${i + 1}image1.png`,
   title: `Design ${i + 1}`,
   category: 'Design',
@@ -80,6 +79,33 @@ const testimonials = [
 function Home() {
   const [activeCategory, setActiveCategory] = useState('Toutes')
   const [selected, setSelected] = useState<Work | null>(null)
+  const [works, setWorks] = useState<Work[]>(fallbackWorks)
+
+  useEffect(() => {
+    let cancelled = false
+    supabase
+      .from('portfolio_works')
+      .select('title, category, image_path, static_src')
+      .order('sort_order', { ascending: false })
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled || error || !data) return
+        setWorks(
+          data.map((w) => ({
+            src: w.image_path
+              ? supabase.storage.from('portfolio').getPublicUrl(w.image_path).data.publicUrl
+              : (w.static_src ?? ''),
+            title: w.title ?? '',
+            category: w.category,
+          }))
+        )
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const categories = ['Toutes', ...Array.from(new Set(works.map((w) => w.category)))]
   const visibleWorks = works.filter((w) => activeCategory === 'Toutes' || w.category === activeCategory)
 
   return (

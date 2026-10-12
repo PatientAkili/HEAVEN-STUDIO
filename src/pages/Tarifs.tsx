@@ -1,10 +1,19 @@
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Footer from '../components/Footer'
+import { supabase } from '../lib/supabaseClient'
 import BackgroundDecor from '../components/BackgroundDecor'
 
-const offres = [
+interface Offre {
+  nom: string
+  prix: string
+  description: string
+  inclus: string[]
+  populaire?: boolean
+}
+
+const fallbackOffres: Offre[] = [
   {
     nom: 'Essentiel',
     prix: '150 $',
@@ -28,9 +37,34 @@ const offres = [
 
 function Tarifs() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [offres, setOffres] = useState<Offre[]>(fallbackOffres)
+
+  useEffect(() => {
+    let cancelled = false
+    supabase
+      .from('tariff_plans')
+      .select('name, price, description, features, popular, sort_order')
+      .order('sort_order', { ascending: true })
+      .then(({ data, error }) => {
+        if (cancelled || error || !data) return
+        setOffres(
+          data.map((p) => ({
+            nom: p.name,
+            prix: p.price,
+            description: p.description ?? '',
+            inclus: p.features ?? [],
+            populaire: p.popular,
+          }))
+        )
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
-    <div className="tarifs-page" style={styles.page}>
+    <div className={`tarifs-page${offres.length > 3 ? ' tarifs-many' : ''}`} style={styles.page}>
+      <style>{`.tarifs-many { height: auto !important; min-height: 100vh; overflow-y: auto !important; }`}</style>
       <BackgroundDecor />
       <style>{`
         .tarifs-page {
