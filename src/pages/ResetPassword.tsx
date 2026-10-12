@@ -39,7 +39,7 @@ function ResetPassword() {
 
   return (
     <div style={styles.container}>
-      <form onSubmit={handleSubmit} style={styles.card}>
+      <form onSubmit={handleSubmit} className="auth-card" style={styles.card}>
         <h1 style={styles.brand}>Nouveau mot de passe</h1>
         <p style={styles.subtitle}>Définissez un nouveau mot de passe pour votre compte</p>
 

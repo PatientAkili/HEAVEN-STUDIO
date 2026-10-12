@@ -60,7 +60,7 @@ function AdminLogin() {
   return (
     <div style={styles.container}>
       <BackgroundDecor />
-      <form onSubmit={handleLogin} style={styles.card}>
+      <form onSubmit={handleLogin} className="auth-card" style={styles.card}>
         <img src="/logo.png" alt="" style={styles.brandLogo} />
         <h1 style={styles.brand}>Espace Admin</h1>
         <p style={styles.subtitle}>Accès réservé au studio</p>

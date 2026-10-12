@@ -34,7 +34,7 @@ function Login() {
   return (
     <div style={styles.container}>
       <BackgroundDecor />
-      <form onSubmit={handleLogin} style={styles.card}>
+      <form onSubmit={handleLogin} className="auth-card" style={styles.card}>
         <img src="/logo.png" alt="" style={styles.brandLogo} />
         <h1 style={styles.brand}>HEAVEN ROYAL STUDIO PROD</h1>
         <p style={styles.subtitle}>Connectez-vous pour accéder à vos photos et vidéos</p>

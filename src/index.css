@@ -63,3 +63,23 @@ html, body {
     padding-left: 0 !important;
   }
 }
+
+/* mobile-compact */
+@media (max-width: 600px) {
+  .tarifs-grid { gap: 0.9rem !important; padding: 0 1rem 1.5rem !important; }
+  .tarifs-grid > div { padding: 1rem 0.95rem !important; border-radius: 14px !important; }
+  .tarifs-grid > div h2 { font-size: 1rem !important; margin: 0.2rem 0 0.1rem !important; }
+  .tarifs-grid > div > p:nth-of-type(1) { font-size: 1.4rem !important; margin: 0 0 0.35rem !important; }
+  .tarifs-grid > div > p:nth-of-type(2) { font-size: 0.78rem !important; margin: 0 0 0.7rem !important; }
+  .tarifs-grid > div ul { gap: 0.3rem !important; margin: 0 0 0.8rem !important; }
+  .tarifs-grid > div li { font-size: 0.78rem !important; }
+  .tarifs-grid > div > a { padding: 0.55rem !important; font-size: 0.82rem !important; }
+}
+@media (max-width: 480px) {
+  .auth-card { max-width: 310px !important; padding: 1.4rem 1.2rem !important; gap: 0.7rem !important; border-radius: 14px !important; }
+  .auth-card img { height: 40px !important; }
+  .auth-card h1 { font-size: 1.15rem !important; }
+  .auth-card p { font-size: 0.78rem !important; }
+  .auth-card input { padding: 0.65rem 0.8rem !important; font-size: 0.9rem !important; }
+  .auth-card button { padding: 0.7rem !important; font-size: 0.9rem !important; }
+}
