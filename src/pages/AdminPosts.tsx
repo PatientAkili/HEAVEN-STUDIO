@@ -5,7 +5,6 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import BackgroundDecor from '../components/BackgroundDecor'
 
-const ADMIN_UID = 'cc4500b3-159f-4871-b478-6884e50e1ccc'
 const MAX_IMAGES = 10
 
 interface Post {
@@ -95,7 +94,8 @@ function AdminPosts() {
   useEffect(() => {
     const init = async () => {
       const { data } = await supabase.auth.getSession()
-      if (!data.session || data.session.user.id !== ADMIN_UID) {
+      const { data: isAdmin } = data.session ? await supabase.rpc('is_admin') : { data: false }
+      if (!data.session || isAdmin !== true) {
         navigate('/admin/connexion')
         return
       }
