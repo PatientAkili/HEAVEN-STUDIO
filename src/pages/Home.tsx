@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import BackgroundDecor from '../components/BackgroundDecor'
+import PortfolioCarousel from '../components/PortfolioCarousel'
 import { supabase } from '../lib/supabaseClient'
 import PostsFeed from '../components/PostsFeed'
 
@@ -256,25 +257,7 @@ function Home() {
         ))}
       </div>
 
-      <div className="portfolio-grid" style={styles.grid}>
-        {visibleWorks.length === 0 ? (
-          <p style={styles.emptyText}>Aucune réalisation dans cette catégorie pour le moment.</p>
-        ) : (
-          visibleWorks.map((work) => (
-            <button key={work.src} className="work-card" style={styles.workCard} onClick={() => setSelected(work)}>
-              <img src={work.src} alt={work.title} style={styles.workImg} loading="lazy" />
-              <span className="work-overlay">
-                <span className="work-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                    <circle cx="11" cy="11" r="7" />
-                    <line x1="16.5" y1="16.5" x2="21" y2="21" />
-                  </svg>
-                </span>
-              </span>
-            </button>
-          ))
-        )}
-      </div>
+      <PortfolioCarousel key={activeCategory} works={visibleWorks} onOpen={setSelected} />
 
       {selected && (
         <div style={styles.lightbox} onClick={() => setSelected(null)}>
